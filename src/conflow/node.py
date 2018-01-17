@@ -30,7 +30,7 @@ class ConfigNode:
         return 'ConfigNode(\'{name}\', {value})'.format(
             name=self.__name, value=self.__value)
 
-    def __create_nodes(self, config: Dict) -> None:
+    def __create_nodes(self, config: Dict[ConfigKey, ConfigValue]) -> None:
         """
         Create ConfigNodes for all child values
 
