@@ -21,14 +21,14 @@ class ConfigNode:
         """
         self.__key: ConfigKey = key
         self.__value: ConfigValue = value
+        self.__parent: Optional['ConfigNode'] = parent
         self.__nodes: Dict[ConfigKey, 'ConfigNode'] = {}
-        self.__parent: Optional[ConfigNode] = parent
         if isinstance(value, (dict,)):
             self.__create_nodes(value)
 
     def __repr__(self) -> str:
-        return 'ConfigNode(\'{name}\', {value})'.format(
-            name=self.__name, value=self.__value)
+        return 'ConfigNode({key}, {value})'.format(
+            key=repr(self.__key), value=repr(self.value))
 
     def __create_nodes(self, config: Dict[ConfigKey, ConfigValue]) -> None:
         """
