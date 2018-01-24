@@ -20,6 +20,7 @@ class PyTest(TestCommand):
 
 
 install_requires = [
+    'PyYAML==3.12'
 ]
 
 tests_require = [
