@@ -51,6 +51,7 @@ extras_require = {
     'dev': dev_require,
     'lint': lint_require,
     'static': static_require,
+    'ci': static_require + lint_require + tests_require,
 }
 
 cmdclass = {

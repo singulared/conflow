@@ -30,7 +30,7 @@ class ConfigNode:
         return 'ConfigNode({key}, {value})'.format(
             key=repr(self.__key), value=repr(self.value))
 
-    def __iter__(self) -> Iterable:
+    def __iter__(self) -> Iterable['ConfigNode']:
         """
         Implement iterator interface for child nodes
         """
