@@ -1,4 +1,4 @@
-from typing import Dict, Union, List, Optional
+from typing import Dict, Union, List, Optional, Iterable
 
 
 ConfigKey = Union[str]
@@ -29,6 +29,12 @@ class ConfigNode:
     def __repr__(self) -> str:
         return 'ConfigNode({key}, {value})'.format(
             key=repr(self.__key), value=repr(self.value))
+
+    def __iter__(self) -> Iterable:
+        """
+        Implement iterator interface for child nodes
+        """
+        return iter(self.__nodes.values())
 
     def __create_nodes(self, config: Dict[ConfigKey, ConfigValue]) -> None:
         """
