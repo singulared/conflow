@@ -19,24 +19,26 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
+def req_file(filename):
+    with open(filename) as f:
+        content = f.readlines()
+    return [x.strip() for x in content]
+
+
 install_requires = [
-    'PyYAML==3.12'
+    req_file('requirements.txt')
 ]
 
 tests_require = [
-    'pytest==3.3.2',
-    'pytest-cov==2.5.1',
-    'pytest-sugar==0.9.0',
+    req_file('requirements-tests.txt')
 ]
 
 lint_require = [
-    'flake8==3.5.0',
-    'flake8-html==0.4.0',
+    req_file('requirements-lint.txt')
 ]
 
 static_require = [
-    'mypy==0.560',
-    'lxml==4.1.1',
+    req_file('requirements-static.txt')
 ]
 
 setup_requires = [
@@ -44,12 +46,12 @@ setup_requires = [
 ]
 
 dev_require = [
-    'ipdb==0.10.3'
+    req_file('requirements-dev.txt')
 ]
 
 extras_require = {
     'test': tests_require,
-    'dev': dev_require,
+    'dev': dev_require + tests_require,
     'lint': lint_require,
     'static': static_require,
     'ci': static_require + lint_require + tests_require,
