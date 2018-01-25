@@ -25,28 +25,13 @@ def req_file(filename):
     return [x.strip() for x in content]
 
 
-install_requires = [
-    req_file('requirements.txt')
-]
-
-tests_require = [
-    req_file('requirements-tests.txt')
-]
-
-lint_require = [
-    req_file('requirements-lint.txt')
-]
-
-static_require = [
-    req_file('requirements-static.txt')
-]
-
+install_requires = req_file('requirements.txt')
+tests_require = req_file('requirements-tests.txt')
+lint_require = req_file('requirements-lint.txt')
+static_require = req_file('requirements-static.txt')
+dev_require = req_file('requirements-dev.txt')
 setup_requires = [
     'setuptools-scm==1.15.6'
-]
-
-dev_require = [
-    req_file('requirements-dev.txt')
 ]
 
 extras_require = {
