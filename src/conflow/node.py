@@ -27,6 +27,7 @@ class ConfigNode:
             self.__create_nodes(value)
 
     def __repr__(self) -> str:
+        """Representation on ConfigNode object"""
         return 'ConfigNode({key}, {value})'.format(
             key=repr(self.__key), value=repr(self.value))
 
