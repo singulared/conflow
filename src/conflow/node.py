@@ -5,19 +5,30 @@ ConfigKey = Union[str]
 ConfigValue = Union[str, int, float, bool, None]
 
 
-class ConfigNode:
-    def __init__(self, key: ConfigKey, value: ConfigValue = None,
-                 parent: Optional['ConfigNode'] = None) -> None:
+class AbstractNode:
+    """Pure abstract class needed only for right class hierarchy"""
+    pass
+
+
+class ConfigNode(AbstractNode):
+    """
+    Class implement Map container for configuration tree node model.
+
+    Provide interface for access configuration record.
+    """
+    def __init__(self, key: Optional[ConfigKey] = None,
+                 value: Optional[ConfigValue] = None,
+                 parent: Optional[AbstractNode] = None) -> None:
         """
         Create instance of ConfigNode.
 
         :param name: Config record name
         :param value: Config record value
-        :param parent: parent ConfigNode object
+        :param parent: parent AbstractNode object
         """
-        self._key: ConfigKey = key
-        self._value: ConfigValue = value
-        self._parent: Optional['ConfigNode'] = parent
+        self._key: Optional[ConfigKey] = key
+        self._value: Optional[ConfigValue] = value
+        self._parent: Optional[AbstractNode] = parent
 
     def __repr__(self) -> str:
         """Representation of ConfigNode object"""
@@ -39,41 +50,60 @@ class ConfigNode:
         """Implementation of != operator"""
         return self.value != other
 
+    def compile(self) -> ConfigValue:
+        """Method return Node value represented by Python object"""
+        return self.value
 
-class ConfigList(ConfigNode):
+
+class ConfigList(AbstractNode):
+    """
+    Class implement Map container for configuration tree node model.
+
+    Provide interface for access configuration records.
+    """
     def __init__(self, key: ConfigKey, value: List[ConfigValue],
-                 parent: Optional[ConfigNode] = None) -> None:
+                 parent: Optional[AbstractNode] = None) -> None:
+        """
+        Create instance of ConfigList.
+
+        :param name: Config record name
+        :param value: Config record values (list)
+        :param parent: parent AbstractNode object
+        """
         self._key: ConfigKey = key
-        self._values: List[ConfigValue] = value
-        self._parent: Optional[ConfigNode] = parent
-        self.__nodes: List[ConfigNode] = self.__create_nodes(self._values)
+        self._parent: Optional[AbstractNode] = parent
+        self.__nodes: List[ConfigNode] = self.__create_nodes(value)
 
     def __repr__(self) -> str:
         """Representation of ConfigList object"""
         return 'ConfigList({key}, {value})'.format(
-            key=repr(self._key), value=repr(self._values))
+            key=repr(self._key), value=repr(self.compile()))
+
+    def compile(self) -> List[ConfigValue]:
+        """Method return Node value represented by Python object"""
+        return [node.compile() for node in self.__nodes]
 
     def __create_nodes(self, values: List[ConfigValue]) -> List[ConfigNode]:
         """
         Create ConfigNodes for all child values
 
-        :param config: part of configuration tree
+        :param value: list of configuration tree values
         """
         return [ConfigNode(self._key, value, self) for value in values]
 
-    def __getitem__(self, key: int) -> 'ConfigNode':
-        """
-        Implementation of __getitem__ magic method
-
-        :param key: Access key for data
-        """
-        return self.__nodes[key]
-
-    def __iter__(self) -> Iterable['ConfigNode']:
+    def __iter__(self) -> Iterable[ConfigNode]:
         """
         Implement iterator interface for child nodes
         """
         return iter(self.__nodes)
+
+    def __eq__(self, other: object) -> bool:
+        """Implementation of == operator"""
+        return self.__nodes == other
+
+    def __ne__(self, other: object) -> bool:
+        """Implementation of != operator"""
+        return self.__nodes != other
 
     def __contains__(self, item: ConfigValue) -> bool:
         """
@@ -83,15 +113,22 @@ class ConfigList(ConfigNode):
         """
         return item in self.__nodes
 
+    def __getitem__(self, key: int) -> AbstractNode:
+        """
+        Implementation of __getitem__ magic method
+        :param key: Access key for data
+        """
+        return self.__nodes[key]
 
-class ConfigMap(ConfigNode):
+
+class ConfigMap(AbstractNode):
     """
-    Class implement container for configuration tree node model.
+    Class implement Map container for configuration tree node model.
 
-    Provide interface for access configuration record.
+    Provide interface for access configuration records.
     """
     def __init__(self, key: ConfigKey, value: Dict[ConfigKey, ConfigValue],
-                 parent: Optional[ConfigNode] = None) -> None:
+                 parent: Optional[AbstractNode] = None) -> None:
         """
         Create instance of ConfigNode.
 
@@ -100,7 +137,7 @@ class ConfigMap(ConfigNode):
         """
         self._key: ConfigKey = key
         self._values: Dict[ConfigKey, ConfigValue] = value
-        self._parent: Optional[ConfigNode] = parent
+        self._parent: Optional[AbstractNode] = parent
         self.__nodes: Dict[ConfigKey, ConfigNode] = self.__create_nodes(
             self._values)
 
@@ -125,7 +162,7 @@ class ConfigMap(ConfigNode):
         return {key: ConfigNode(
             key, value, self) for key, value in config.items()}
 
-    def __getattr__(self, name: ConfigKey) -> 'ConfigNode':
+    def __getattr__(self, name: ConfigKey) -> AbstractNode:
         """
         Implementation of __getattr__ magic method
 
@@ -133,13 +170,13 @@ class ConfigMap(ConfigNode):
         """
         return self.__nodes.get(name, ConfigNode(None))
 
-    def __getitem__(self, key: ConfigKey) -> 'ConfigNode':
-        """
-        Implementation of __getitem__ magic method
+    def __eq__(self, other: object) -> bool:
+        """Implementation of == operator"""
+        return self.__nodes == other
 
-        :param key: Access key for data
-        """
-        return self.__nodes[key]
+    def __ne__(self, other: object) -> bool:
+        """Implementation of != operator"""
+        return self.__nodes != other
 
     def __contains__(self, item: ConfigValue) -> bool:
         """
@@ -147,4 +184,11 @@ class ConfigMap(ConfigNode):
 
         :param item: Value for checking on existing in configuration
         """
-        return item in self.__nodes
+        return item in self.__nodes.values()
+
+    def __getitem__(self, key: ConfigKey) -> 'ConfigNode':
+        """
+        Implementation of __getitem__ magic method
+        :param key: Access key for data
+        """
+        return self.__nodes[key]
