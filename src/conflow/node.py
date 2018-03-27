@@ -1,47 +1,48 @@
-from typing import Dict, Union, Optional, Iterable, List
+from typing import Dict, Union, Optional, Iterable, List, TypeVar, Generic
 
 
 ConfigKey = Union[str]
 ConfigValue = Union[str, int, float, bool, None]
 
+T = TypeVar('T')
+TP = TypeVar('TP')
 
-class AbstractNode:
+
+class Node(Generic[T]):
     """Pure abstract class needed only for right class hierarchy"""
-    pass
-
-
-class ConfigNode(AbstractNode):
-    """
-    Class implement Map container for configuration tree node model.
-
-    Provide interface for access configuration record.
-    """
     def __init__(self, key: Optional[ConfigKey] = None,
-                 value: Optional[ConfigValue] = None,
-                 parent: Optional[AbstractNode] = None) -> None:
+                 value: Optional[T] = None,
+                 parent: Optional['Node[TP]'] = None) -> None:
         """
         Create instance of ConfigNode.
 
         :param name: Config record name
         :param value: Config record value
-        :param parent: parent AbstractNode object
+        :param parent: parent Node object
         """
         self._key: Optional[ConfigKey] = key
-        self._value: Optional[ConfigValue] = value
-        self._parent: Optional[AbstractNode] = parent
-
-    def __repr__(self) -> str:
-        """Representation of ConfigNode object"""
-        return 'ConfigNode({key}, {value})'.format(
-            key=repr(self._key), value=repr(self.value))
+        self._value: Optional[T] = value
+        self._parent: Optional[Node[TP]] = parent
 
     @property
-    def value(self) -> ConfigValue:
+    def value(self) -> Optional[T]:
         """
         Property for accessing configuration node value
         """
         return self._value
 
+    def __repr__(self) -> str:
+        """Representation of Node object"""
+        return 'Node({key}, {value})'.format(
+            key=repr(self._key), value=repr(self.value))
+
+
+class ConfigNode(Node[ConfigValue]):
+    """
+    Class implement container for configuration AST tree node model.
+
+    Provide interface for access configuration record.
+    """
     def __eq__(self, other: object) -> bool:
         """Implementation of == operator"""
         return self.value == other
@@ -55,23 +56,23 @@ class ConfigNode(AbstractNode):
         return self.value
 
 
-class ConfigList(AbstractNode):
+class ConfigList(Node):
     """
     Class implement Map container for configuration tree node model.
 
     Provide interface for access configuration records.
     """
     def __init__(self, key: ConfigKey, value: List[ConfigValue],
-                 parent: Optional[AbstractNode] = None) -> None:
+                 parent: Optional[Node] = None) -> None:
         """
         Create instance of ConfigList.
 
         :param name: Config record name
         :param value: Config record values (list)
-        :param parent: parent AbstractNode object
+        :param parent: parent Node object
         """
         self._key: ConfigKey = key
-        self._parent: Optional[AbstractNode] = parent
+        self._parent: Optional[Node] = parent
         self.__nodes: List[ConfigNode] = self.__create_nodes(value)
 
     def __repr__(self) -> str:
@@ -113,7 +114,7 @@ class ConfigList(AbstractNode):
         """
         return item in self.__nodes
 
-    def __getitem__(self, key: int) -> AbstractNode:
+    def __getitem__(self, key: int) -> Node:
         """
         Implementation of __getitem__ magic method
         :param key: Access key for data
@@ -121,14 +122,14 @@ class ConfigList(AbstractNode):
         return self.__nodes[key]
 
 
-class ConfigMap(AbstractNode):
+class ConfigMap(Node):
     """
     Class implement Map container for configuration tree node model.
 
     Provide interface for access configuration records.
     """
     def __init__(self, key: ConfigKey, value: Dict[ConfigKey, ConfigValue],
-                 parent: Optional[AbstractNode] = None) -> None:
+                 parent: Optional[Node] = None) -> None:
         """
         Create instance of ConfigNode.
 
@@ -137,7 +138,7 @@ class ConfigMap(AbstractNode):
         """
         self._key: ConfigKey = key
         self._values: Dict[ConfigKey, ConfigValue] = value
-        self._parent: Optional[AbstractNode] = parent
+        self._parent: Optional[Node] = parent
         self.__nodes: Dict[ConfigKey, ConfigNode] = self.__create_nodes(
             self._values)
 
@@ -162,7 +163,7 @@ class ConfigMap(AbstractNode):
         return {key: ConfigNode(
             key, value, self) for key, value in config.items()}
 
-    def __getattr__(self, name: ConfigKey) -> AbstractNode:
+    def __getattr__(self, name: ConfigKey) -> Node:
         """
         Implementation of __getattr__ magic method
 
