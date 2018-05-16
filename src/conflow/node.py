@@ -1,17 +1,26 @@
-from typing import Sequence, Union, Optional, Iterable, TypeVar, Generic
+from typing import Sequence, Union, Optional, Iterable, TypeVar, Generic, Text
 from typing import Iterator, Mapping
 
 
-ConfigKey = Union[str, int]
-ConfigValue = Optional[Union[str, int, float, bool]]
+TK = Union[str, int]
+TV = Optional[Union[str, int, float, bool]]
 
 T = TypeVar('T')
 TP = TypeVar('TP')
 
 
+def node_factory(key: TK, value: T,
+                 parent: 'Optional[Node[TP]]' = None) -> 'Node':
+    if isinstance(value, Sequence) and not isinstance(value, Text):
+        return NodeList(key, value, parent)
+    elif isinstance(value, dict):
+        return NodeMap(key, value, parent)
+    return Node(key, value, parent)
+
+
 class Node(Generic[T]):
-    """Base class needed only for right class hierarchy"""
-    def __init__(self, key: ConfigKey,
+    """Base class of Node tree"""
+    def __init__(self, key: TK,
                  value: Optional[T] = None,
                  parent: Optional['Node[TP]'] = None) -> None:
         """
@@ -21,7 +30,7 @@ class Node(Generic[T]):
         :param value: Config record value
         :param parent: parent Node object
         """
-        self._key: ConfigKey = key
+        self._key: TK = key
         self._value: Optional[T] = value
         self._parent: Optional[Node[TP]] = parent
 
@@ -50,13 +59,13 @@ class Node(Generic[T]):
         return self.value != other
 
 
-class NodeList(Node[Sequence]):
+class NodeList(Node[Iterable[Optional[T]]]):
     """
     Class implement Map container for configuration tree node model.
 
     Provide interface for access configuration records.
     """
-    def __init__(self, key: ConfigKey, value: Sequence[T],
+    def __init__(self, key: TK, value: Sequence[Optional[T]],
                  parent: Optional[Node[TP]] = None) -> None:
         """
         Create instance of ConfigList.
@@ -78,13 +87,13 @@ class NodeList(Node[Sequence]):
         return [node.compile() for node in self.__nodes]
 
     def __create_nodes(
-            self, values: Sequence[T]) -> Sequence[Node[T]]:
+            self, values: Sequence[Optional[T]]) -> Sequence[Node[T]]:
         """
         Create ConfigNodes for all child values
 
         :param value: list of configuration tree values
         """
-        return [Node(self._key, value, self) for value in values]
+        return [node_factory(self._key, value, self) for value in values]
 
     def __iter__(self) -> Iterator[Node[T]]:
         """
@@ -122,7 +131,7 @@ class NodeMap(Node[Mapping]):
 
     Provide interface for access configuration records.
     """
-    def __init__(self, key: ConfigKey, value: Mapping[ConfigKey, T],
+    def __init__(self, key: TK, value: Mapping[TK, T],
                  parent: Optional[Node[TP]] = None) -> None:
         """
         Create instance of ConfigNode.
@@ -131,7 +140,7 @@ class NodeMap(Node[Mapping]):
         :param value: Config record value
         """
         super().__init__(key, value, parent)
-        self.__nodes: Mapping[ConfigKey, Node[T]] = self.__create_nodes(value)
+        self.__nodes: Mapping[TK, Node[T]] = self.__create_nodes(value)
 
     def __repr__(self) -> str:
         """Representation of ConfigMap object"""
@@ -144,17 +153,16 @@ class NodeMap(Node[Mapping]):
         """
         return iter(self.__nodes.values())
 
-    def __create_nodes(self, config: Mapping[ConfigKey, T]) -> Mapping[
-            ConfigKey, Node[T]]:
+    def __create_nodes(self, config: Mapping[TK, T]) -> Mapping[TK, Node[T]]:
         """
         Create ConfigNodes for all child values
 
         :param config: part of configuration tree
         """
-        return {key: Node(
+        return {key: node_factory(
             key, value, self) for key, value in config.items()}
 
-    def __getattr__(self, name: ConfigKey) -> Node[T]:
+    def __getattr__(self, name: TK) -> Node[T]:
         """
         Implementation of __getattr__ magic method
 
@@ -162,7 +170,7 @@ class NodeMap(Node[Mapping]):
         """
         return self.__nodes.get(name, Node(name))
 
-    def __contains__(self, item: ConfigValue) -> bool:
+    def __contains__(self, item: TK) -> bool:
         """
         Implementation of __contains__ magic method
 
@@ -170,7 +178,7 @@ class NodeMap(Node[Mapping]):
         """
         return item in self.__nodes.values()
 
-    def __getitem__(self, key: ConfigKey) -> Node[T]:
+    def __getitem__(self, key: TK) -> Node[T]:
         """
         Implementation of __getitem__ magic method
         :param key: Access key for data
