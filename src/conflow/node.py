@@ -1,5 +1,5 @@
-from typing import Union, Optional, Iterable, TypeVar, Generic, List, overload
-from typing import Iterator, Mapping, Collection, cast, Any, Dict
+from typing import (Any, Collection, Generic, Iterable, Iterator, List,
+                    Mapping, Optional, TypeVar, Union, cast, overload)
 
 
 TK = Union[str, int]
@@ -257,23 +257,3 @@ def node_factory(key: TK,
     elif isinstance(value, Mapping):
         return NodeMap(key, value)
     return Node(key, value)
-
-
-#  if __name__ == '__main__':
-    #  # test node map
-    #  nm = node_factory('test', {'a': 321})
-    #  len(nm)
-    #  nm.test_list()
-    #  # reveal_type(nm)
-
-    #  # test node list
-    #  node = node_factory('test', [1, 2, 3, 4])
-    #  print(node.value)
-    #  len(node)
-    #  1 in node
-    #  node.test_map()
-
-    #  # test node
-    #  node2 = node_factory('test', 123)
-    #  len(node2)
-    #  1 in node2
