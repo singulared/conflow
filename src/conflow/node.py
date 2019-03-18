@@ -164,7 +164,7 @@ class NodeMap(AbstractNode[Mapping[TK, T]], Mapping[TK, AbstractNode[T]]):
     def __repr__(self) -> str:
         """Representation of ConfigMap object"""
         return 'ConfigMap({key}, {value})'.format(
-            key=repr(self._key), value=repr(self._values))
+            key=repr(self._key), value=repr(self.__nodes))
 
     def __iter__(self) -> Iterator[TK]:
         """
@@ -178,7 +178,8 @@ class NodeMap(AbstractNode[Mapping[TK, T]], Mapping[TK, AbstractNode[T]]):
         """
         return len(self.__nodes)
 
-    def __create_nodes(self, config: Mapping[TK, T]
+    def __create_nodes(self,
+                       config: Mapping[TK, T]
                        ) -> Mapping[TK, AbstractNode[T]]:
         """
         Create ConfigNodes for all child values
