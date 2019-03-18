@@ -1,9 +1,9 @@
-from typing import Union, Optional, Iterable, TypeVar, Generic, List
-from typing import Iterator, Mapping, Collection, cast
+from typing import Union, Optional, Iterable, TypeVar, Generic, List, overload
+from typing import Iterator, Mapping, Collection, cast, Any, Dict
 
 
 TK = Union[str, int]
-TV = Optional[Union[str, int, float, bool]]
+VALUE_TYPES = Optional[Union[str, int, float, bool]]
 
 T = TypeVar('T')
 TP = TypeVar('TP')
@@ -98,7 +98,11 @@ class NodeList(AbstractNode[Collection[T]], Collection[AbstractNode[T]]):
 
         :param value: list of configuration tree values
         """
-        return [node_factory(self._key, value, self) for value in values]
+        return [
+            cast(AbstractNode[T], node_factory(
+                self._key, value, cast(AbstractNode[T], self)
+            )) for value in values
+        ]
 
     def __iter__(self) -> Iterator[AbstractNode[T]]:
         """
@@ -134,6 +138,9 @@ class NodeList(AbstractNode[Collection[T]], Collection[AbstractNode[T]]):
         :param key: Access key for data
         """
         return self.__nodes[key]
+
+    def test_list(self) -> int:
+        return 42
 
 
 class NodeMap(AbstractNode[Mapping[TK, T]], Mapping[TK, AbstractNode[T]]):
@@ -178,8 +185,8 @@ class NodeMap(AbstractNode[Mapping[TK, T]], Mapping[TK, AbstractNode[T]]):
 
         :param config: part of configuration tree
         """
-        return {key: node_factory(
-            key, value, self) for key, value in config.items()}
+        return {key: cast(AbstractNode[T], node_factory(
+            key, value, self)) for key, value in config.items()}
 
     def __getattr__(self, name: TK) -> AbstractNode[T]:
         """
@@ -204,19 +211,68 @@ class NodeMap(AbstractNode[Mapping[TK, T]], Mapping[TK, AbstractNode[T]]):
         """
         return self.__nodes[key]
 
+    def test_map(self) -> int:
+        return 42
+
+
+TL = TypeVar('TL')
+TU = Union[NodeList[Any], Node[Any], NodeMap[Any]]
+
+
+@overload
+def node_factory(key: TK,
+                 value: VALUE_TYPES,
+                 parent: Optional[AbstractNode[Any]] = None
+                 ) -> Node[VALUE_TYPES]: ...
+
+
+@overload
+def node_factory(key: TK,
+                 value: List[T],
+                 parent: Optional[AbstractNode[Any]] = None
+                 ) -> NodeList[T]: ...
+
+
+@overload
+def node_factory(key: TK,
+                 value: Mapping[TK, T],
+                 parent: Optional[AbstractNode[Any]] = None
+                 ) -> NodeMap[T]: ...
+
+
+@overload
+def node_factory(key: TK,
+                 value: T,
+                 parent: Optional[AbstractNode[Any]] = None
+                 ) -> TU: ...
+
 
 def node_factory(key: TK,
-                 value: TT,
+                 value: TL,
                  parent: Optional[AbstractNode[TP]] = None,
-                 ) -> AbstractNode[TT]:
+                 ) -> TU:
     if isinstance(value, List):
-        return cast(AbstractNode[TT], NodeList(key, value))
+        return NodeList(key, value)
     elif isinstance(value, Mapping):
-        return cast(AbstractNode[TT], NodeMap(key, value))
-    return cast(AbstractNode[TT], Node(key, value))
+        return NodeMap(key, value)
+    return Node(key, value)
 
 
-if __name__ == '__main__':
-    node = node_factory('test', [1, 2, 3, 4])
-    print(node.value)
-    len(node)
+#  if __name__ == '__main__':
+    #  # test node map
+    #  nm = node_factory('test', {'a': 321})
+    #  len(nm)
+    #  nm.test_list()
+    #  # reveal_type(nm)
+
+    #  # test node list
+    #  node = node_factory('test', [1, 2, 3, 4])
+    #  print(node.value)
+    #  len(node)
+    #  1 in node
+    #  node.test_map()
+
+    #  # test node
+    #  node2 = node_factory('test', 123)
+    #  len(node2)
+    #  1 in node2
