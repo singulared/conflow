@@ -63,7 +63,8 @@ class Node(AbstractNode[Optional[T]]):
         return self.value != other
 
 
-class NodeList(AbstractNode[Collection[T]], Collection[AbstractNode[T]]):
+class NodeList(AbstractNode[Collection[Optional[T]]],
+               Collection[AbstractNode[T]]):
     """
     Class implement List container for configuration tree node model.
 
@@ -81,6 +82,10 @@ class NodeList(AbstractNode[Collection[T]], Collection[AbstractNode[T]]):
         self._key: TK = key
         self._parent: Optional[AbstractNode[TP]] = parent
         self.__nodes: List[AbstractNode[T]] = self.__create_nodes(value)
+
+    @property
+    def value(self) -> Collection[Optional[T]]:
+        return [node.value for node in self.__nodes]
 
     def __repr__(self) -> str:
         """Representation of ConfigList object"""
@@ -138,9 +143,6 @@ class NodeList(AbstractNode[Collection[T]], Collection[AbstractNode[T]]):
         :param key: Access key for data
         """
         return self.__nodes[key]
-
-    def test_list(self) -> int:
-        return 42
 
 
 class NodeMap(AbstractNode[Mapping[TK, T]], Mapping[TK, AbstractNode[T]]):
@@ -211,9 +213,6 @@ class NodeMap(AbstractNode[Mapping[TK, T]], Mapping[TK, AbstractNode[T]]):
         :param key: Access key for data
         """
         return self.__nodes[key]
-
-    def test_map(self) -> int:
-        return 42
 
 
 TL = TypeVar('TL')
