@@ -90,7 +90,7 @@ class NodeList(AbstractNode[Collection[Optional[T]]],
     def __repr__(self) -> str:
         """Representation of ConfigList object"""
         return 'NodeList({key}, {value})'.format(
-            key=repr(self._key), value=repr(self.compile()))
+            key=repr(self._key), value=repr(self.value))
 
     def compile(self) -> Collection[T]:
         """Method return Node value represented by Python object"""
@@ -145,7 +145,8 @@ class NodeList(AbstractNode[Collection[Optional[T]]],
         return self.__nodes[key]
 
 
-class NodeMap(AbstractNode[Mapping[TK, T]], Mapping[TK, AbstractNode[T]]):
+class NodeMap(AbstractNode[Mapping[TK, Optional[T]]],
+              Mapping[TK, AbstractNode[T]]):
     """
     Class implement Map container for configuration tree node model.
 
@@ -179,6 +180,10 @@ class NodeMap(AbstractNode[Mapping[TK, T]], Mapping[TK, AbstractNode[T]]):
         Implementation of __len__ magic method
         """
         return len(self.__nodes)
+
+    @property
+    def value(self) -> Mapping[TK, Optional[T]]:
+        return {k: v.value for k, v in self.__nodes.items()}
 
     def __create_nodes(self,
                        config: Mapping[TK, T]
