@@ -19,6 +19,13 @@ def test_node_value(value, other, representation):
     assert node != other
 
 
+@pytest.mark.parametrize('value', [
+    'string', 42, 42.3, True, None,
+])
+def test_node_missing_getattr(value):
+    assert Node('test', value).missing.missingtoo == Node(None, None)
+
+
 @pytest.mark.parametrize('value,representation', [
     ('string', "Node('test', 'string')"),
     (42, "Node('test', 42)"),

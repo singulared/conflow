@@ -60,6 +60,16 @@ class Node(AbstractNode[Optional[T]]):
         """Implementation of != operator."""
         return self.value != other
 
+    def __getattr__(self, name: TK) -> AbstractNode[None]:
+        """
+        Implementation of __getattr__ magic method.
+
+        This method return new empty Node for case of chained access.
+
+        :param name: Attribute name (data access key)
+        """
+        return Node(name, None)
+
 
 class NodeList(AbstractNode[Collection[Optional[T]]],
                Collection[AbstractNode[T]]):

@@ -54,6 +54,15 @@ def test_node_map_nested(value: Dict) -> None:
     assert node.nested.map.a.value == value['nested']['map']['a']
 
 
+@pytest.mark.parametrize('value', NESTED_VALUES)
+def test_node_map_nested_missed_chain(value: Dict) -> None:
+    node = NodeMap('test', value)
+    assert node.missing.missing.value is None
+    assert node.nested.map.missing.value is None
+    with pytest.raises(KeyError):
+        node.nested.map['missing']
+
+
 @pytest.mark.parametrize('value', FLAT_VALUES + ATTRIBUTE_ERROR_VALUES)
 def test_map_getitem(value):
     node = NodeMap('test', value)
