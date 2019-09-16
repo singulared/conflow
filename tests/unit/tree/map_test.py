@@ -37,8 +37,7 @@ def test_node_map(value: Dict) -> None:
 @pytest.mark.parametrize('value', NESTED_VALUES)
 def test_node_map_nested(value: Dict) -> None:
     representation = (
-        "NodeMap('test', {'nested': NodeMap('nested', {'list': NodeList("
-        "'list', [1, 2, 3]), 'map': NodeMap('map', {'a': Node('a', 'a')})})})"
+        "NodeMap('test', {'nested': {'list': [1, 2, 3], 'map': {'a': 'a'}}})"
     )
     node = NodeMap('test', value)
 
@@ -48,6 +47,11 @@ def test_node_map_nested(value: Dict) -> None:
     assert node['nested'] == value['nested']
     assert node['nested']['list'] == value['nested']['list']
     assert node['nested']['map'] == value['nested']['map']
+
+    assert node.nested.value == value['nested']
+    assert node.nested.list.value == value['nested']['list']
+    assert node.nested.map.value == value['nested']['map']
+    assert node.nested.map.a.value == value['nested']['map']['a']
 
 
 @pytest.mark.parametrize('value', FLAT_VALUES + ATTRIBUTE_ERROR_VALUES)

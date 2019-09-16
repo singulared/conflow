@@ -163,7 +163,7 @@ class NodeMap(AbstractNode[Mapping[TK, Optional[T]]],
     def __repr__(self) -> str:
         """Representation of NodeMap object."""
         return 'NodeMap({key}, {value})'.format(
-            key=repr(self._key), value=repr(self.__nodes))
+            key=repr(self._key), value=repr(self.value))
 
     def __iter__(self) -> Iterator[TK]:
         """Implement iterator interface for child nodes."""
