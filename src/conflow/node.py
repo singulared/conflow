@@ -85,6 +85,9 @@ class NodeList(AbstractNode[Collection[Optional[T]]],
 
     @property
     def value(self) -> Collection[Optional[T]]:
+        """
+        Property for accessing configuration node value
+        """
         return [node.value for node in self.__nodes]
 
     def __repr__(self) -> str:
@@ -183,6 +186,9 @@ class NodeMap(AbstractNode[Mapping[TK, Optional[T]]],
 
     @property
     def value(self) -> Mapping[TK, Optional[T]]:
+        """
+        Property for accessing configuration node value
+        """
         return {k: v.value for k, v in self.__nodes.items()}
 
     def __create_nodes(self,
