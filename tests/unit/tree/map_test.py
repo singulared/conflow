@@ -8,6 +8,15 @@ FLAT_VALUES = [
     {'str': 'str', 'int': 123, 'float': 3.14, 'None': None},
 ]
 
+NESTED_VALUES = [
+    {
+        'nested': {
+            'list': [1, 2, 3],
+            'map': {'a': 'a'}
+        }
+    }
+]
+
 ATTRIBUTE_ERROR_VALUES = [
     {1: 321},
     {None: 123},
@@ -23,6 +32,22 @@ def test_node_map(value: Dict) -> None:
     assert node != {'missing key': None}
     assert len(node) == len(value)
     assert 'missing key' not in node
+
+
+@pytest.mark.parametrize('value', NESTED_VALUES)
+def test_node_map_nested(value: Dict) -> None:
+    representation = (
+        "NodeMap('test', {'nested': NodeMap('nested', {'list': NodeList("
+        "'list', [1, 2, 3]), 'map': NodeMap('map', {'a': Node('a', 'a')})})})"
+    )
+    node = NodeMap('test', value)
+
+    assert repr(node) == representation
+    assert node == value
+
+    assert node['nested'] == value['nested']
+    assert node['nested']['list'] == value['nested']['list']
+    assert node['nested']['map'] == value['nested']['map']
 
 
 @pytest.mark.parametrize('value', FLAT_VALUES + ATTRIBUTE_ERROR_VALUES)
