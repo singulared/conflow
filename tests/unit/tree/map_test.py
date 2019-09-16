@@ -77,3 +77,17 @@ def test_map_getattribute_error(value):
         assert k in node
         with pytest.raises(TypeError):
             assert getattr(node, k) == value[k]
+
+
+@pytest.mark.parametrize('value', FLAT_VALUES + ATTRIBUTE_ERROR_VALUES)
+def test_map_repr(value):
+    node = NodeMap('test', value)
+    assert repr(node), repr(value)
+
+
+@pytest.mark.parametrize('value', FLAT_VALUES + ATTRIBUTE_ERROR_VALUES)
+def test_map_value(value):
+    node = NodeMap('test', value)
+    assert node.value, value
+    for k in value:
+        assert node[k].value == value[k]

@@ -29,3 +29,9 @@ def test_node_value(value, other, representation):
 def test_node_repr(value, representation):
     assert repr(Node('test', value)) == representation
 
+
+@pytest.mark.parametrize('value', [
+    'string', 42, 42.3, True, None,
+])
+def test_node_compile(value):
+    assert Node('test', value).compile() == value
