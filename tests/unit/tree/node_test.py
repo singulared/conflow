@@ -13,8 +13,8 @@ def test_node_value(value, other, representation):
     node = Node('test', value)
     assert isinstance(node, AbstractNode)
     assert isinstance(node, Node)
-    assert node.value == value
-    assert node.value != other
+    assert node.value() == value
+    assert node.value() != other
     assert node == value
     assert node != other
 
