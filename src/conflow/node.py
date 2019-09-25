@@ -91,12 +91,12 @@ class NodeList(AbstractNode[Collection[Optional[T]]],
 
     def __call__(self) -> Collection[Optional[T]]:
         """Method for accessing configuration node value."""
-        return [node.value() for node in self.__nodes]
+        return [node() for node in self.__nodes]
 
     def __repr__(self) -> str:
         """Representation of ConfigList object."""
         return 'NodeList({key}, {value})'.format(
-            key=repr(self._key), value=repr(self.value()))
+            key=repr(self._key), value=repr(self()))
 
     def compile(self) -> Collection[T]:
         """Method return Node value represented by Python object."""

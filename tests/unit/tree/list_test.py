@@ -57,7 +57,7 @@ def test_list_item():
 def test_list_value():
     values = [1, 2.0, 'str', None, 'last_value']
     node_list = NodeList('test', values)
-    assert node_list.value() == values
+    assert node_list() == values
 
 
 @pytest.mark.parametrize('value', [
