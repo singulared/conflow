@@ -38,7 +38,11 @@ class Node(AbstractNode[Optional[T]]):
         self._parent: Optional[AbstractNode[TP]] = parent
 
     def __call__(self) -> Optional[T]:
-        """Method for accessing configuration node value."""
+        """
+        Implementation of __call__ magic method.
+
+        This method return Node value.
+        """
         return self._value
 
     def __repr__(self) -> str:
@@ -90,7 +94,11 @@ class NodeList(AbstractNode[Collection[Optional[T]]],
         self.__nodes: List[AbstractNode[T]] = self.__create_nodes(value)
 
     def __call__(self) -> Collection[Optional[T]]:
-        """Method for accessing configuration node value."""
+        """
+        Implementation of __call__ magic method.
+
+        This method return NodeList value.
+        """
         return [node() for node in self.__nodes]
 
     def __repr__(self) -> str:
@@ -170,7 +178,7 @@ class NodeMap(AbstractNode[Mapping[TK, Optional[T]]],
     def __repr__(self) -> str:
         """Representation of NodeMap object."""
         return 'NodeMap({key}, {value})'.format(
-            key=repr(self._key), value=repr(self.value()))
+            key=repr(self._key), value=repr(self()))
 
     def __iter__(self) -> Iterator[TK]:
         """Implement iterator interface for child nodes."""
@@ -180,9 +188,13 @@ class NodeMap(AbstractNode[Mapping[TK, Optional[T]]],
         """Implementation of __len__ magic method."""
         return len(self.__nodes)
 
-    def value(self) -> Mapping[TK, Optional[T]]:
-        """Method for accessing configuration node value."""
-        return {k: v.value() for k, v in self.__nodes.items()}
+    def __call__(self) -> Mapping[TK, Optional[T]]:
+        """
+        Implementation of __call__ magic method.
+
+        This method return NodeMap value.
+        """
+        return {k: v() for k, v in self.__nodes.items()}
 
     def __create_nodes(self,
                        config: Mapping[TK, T]
