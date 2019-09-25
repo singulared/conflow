@@ -12,3 +12,5 @@ script:
   - pytest
   - pip install codecov
   - codecov
+  - pip install codacy-coverage
+  - python-codacy-coverage -r coverage.xml
