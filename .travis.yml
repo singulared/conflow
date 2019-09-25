@@ -2,12 +2,14 @@ dist: xenial
 language: python
 python:
   - "3.6"
+  - "3.6"
   - "3.7"
 
 install:
-  - pip install .[ci]
+  - pip install poetry==1.0.0-b1
+  - poetry install 
 
 script:
-  - python setup.py test
+  - pytest
   - pip install codecov
   - codecov
