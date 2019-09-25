@@ -24,7 +24,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.5"  # Compatible python versions must be declared here
+python = "^3.6"  # Compatible python versions must be declared here
 PyYAML = "^5.1"
 
 [tool.poetry.dev-dependencies]
