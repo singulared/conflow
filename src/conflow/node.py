@@ -11,7 +11,7 @@ TT = TypeVar('TT')
 
 
 class AbstractNode(Generic[T]):
-    def value(self) -> Optional[T]: ...
+    def __call__(self) -> Optional[T]: ...
 
     def compile(self) -> T: ...
 
@@ -37,26 +37,26 @@ class Node(AbstractNode[Optional[T]]):
         self._value: Optional[T] = value
         self._parent: Optional[AbstractNode[TP]] = parent
 
-    def value(self) -> Optional[T]:
+    def __call__(self) -> Optional[T]:
         """Method for accessing configuration node value."""
         return self._value
 
     def __repr__(self) -> str:
         """Representation of Node object."""
         return 'Node({key}, {value})'.format(
-            key=repr(self._key), value=repr(self.value()))
+            key=repr(self._key), value=repr(self()))
 
     def compile(self) -> Optional[T]:
         """Method for construction of original python value."""
-        return self.value()
+        return self()
 
     def __eq__(self, other: object) -> bool:
         """Implementation of == operator."""
-        return self.value() == other
+        return self() == other
 
     def __ne__(self, other: object) -> bool:
         """Implementation of != operator."""
-        return self.value() != other
+        return self() != other
 
     def __getattr__(self, name: TK) -> AbstractNode[None]:
         """
@@ -89,7 +89,7 @@ class NodeList(AbstractNode[Collection[Optional[T]]],
         self._parent: Optional[AbstractNode[TP]] = parent
         self.__nodes: List[AbstractNode[T]] = self.__create_nodes(value)
 
-    def value(self) -> Collection[Optional[T]]:
+    def __call__(self) -> Collection[Optional[T]]:
         """Method for accessing configuration node value."""
         return [node.value() for node in self.__nodes]
 
