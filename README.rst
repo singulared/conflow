@@ -23,7 +23,7 @@ Usage
 
   from conflow import Config, FromFile, FromEnvironment
 
-  LOCAL_SETTINGS = {
+  DEFAULT_SETTINGS = {
       'db': {
           'master': {
               'host': 'localhost',
@@ -44,9 +44,9 @@ Usage
       }
   }
 
-  yaml_settings = FromFile(path='settings.yaml')
+  stage_settings = FromFile(path='stage.yaml')
   env_settings = FromEnvironment(prefix='my_app')
-  config = Config.merge(LOCAL_SETTINGS).merge(yaml_settings).merge(env_settings)
+  config = Config(DEFAULT_SETTINGS).merge(stage_settings).merge(env_settings)
 
 Motivation
 ==========

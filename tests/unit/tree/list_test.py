@@ -58,13 +58,3 @@ def test_list_value():
     values = [1, 2.0, 'str', None, 'last_value']
     node_list = NodeList('test', values)
     assert node_list() == values
-
-
-@pytest.mark.parametrize('value', [
-    ['string', 42, 42.3, True, None],
-    [42],
-    [None],
-    []
-])
-def test_list_compile(value):
-    assert NodeList('test', value).compile() == value

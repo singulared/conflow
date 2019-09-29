@@ -1,7 +1,6 @@
 from typing import (Any, Collection, Generic, Iterable, Iterator, List,
                     Mapping, Optional, TypeVar, Union, cast, overload)
 
-
 TK = Union[str, int]
 VALUE_TYPES = Optional[Union[str, int, float, bool]]
 
@@ -12,8 +11,6 @@ TT = TypeVar('TT')
 
 class AbstractNode(Generic[T]):
     def __call__(self) -> Optional[T]: ...
-
-    def compile(self) -> T: ...
 
 
 class Node(AbstractNode[Optional[T]]):
@@ -49,10 +46,6 @@ class Node(AbstractNode[Optional[T]]):
         """Representation of Node object."""
         return 'Node({key}, {value})'.format(
             key=repr(self._key), value=repr(self()))
-
-    def compile(self) -> Optional[T]:
-        """Method for construction of original python value."""
-        return self()
 
     def __eq__(self, other: object) -> bool:
         """Implementation of == operator."""
@@ -105,10 +98,6 @@ class NodeList(AbstractNode[Collection[Optional[T]]],
         """Representation of ConfigList object."""
         return 'NodeList({key}, {value})'.format(
             key=repr(self._key), value=repr(self()))
-
-    def compile(self) -> Collection[T]:
-        """Method return Node value represented by Python object."""
-        return [node.compile() for node in self.__nodes]
 
     def __create_nodes(
             self, values: Iterable[T]) -> List[AbstractNode[T]]:
