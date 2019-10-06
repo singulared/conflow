@@ -6,7 +6,7 @@ T = TypeVar('T')
 P = TypeVar('P')
 
 TK = Union[str, int]
-Path = Tuple[TK]
+Path = Tuple[TK, ...]
 
 
 def path_from(path: Optional[Path], key: TK) -> Path:
