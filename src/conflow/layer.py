@@ -31,7 +31,7 @@ def flatten_tree(path: Optional[Path], node: NodeMap[T]
 
 
 def flatten_tree(path: Optional[Path], node: AbstractNode[T]
-                 ) -> Generator[Tuple[Path, AbstractNode[T]], None, None]:
+                 ) -> Generator[Tuple[Path, AbstractNode[P]], None, None]:
     if isinstance(node, Node):
         yield path_from(path, node._key), node
 
