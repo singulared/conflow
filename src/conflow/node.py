@@ -1,5 +1,5 @@
 from typing import (Any, Collection, Generic, Iterable, Iterator, List,
-                    Mapping, Optional, TypeVar, Union, cast, overload)
+                    MutableMapping, Optional, TypeVar, Union, cast, overload)
 
 TK = Union[str, int]
 VALUE_TYPES = Optional[Union[str, int, float, bool]]
@@ -7,6 +7,8 @@ VALUE_TYPES = Optional[Union[str, int, float, bool]]
 T = TypeVar('T')
 TP = TypeVar('TP')
 TT = TypeVar('TT')
+TU = Union['NodeList[Any]', 'Node[Any]', 'NodeMap[Any]']
+TL = TypeVar('TL')
 
 
 class AbstractNode(Generic[T]):
@@ -145,14 +147,14 @@ class NodeList(AbstractNode[Collection[Optional[T]]],
         return self.__nodes[key]
 
 
-class NodeMap(AbstractNode[Mapping[TK, Optional[T]]],
-              Mapping[TK, AbstractNode[T]]):
+class NodeMap(AbstractNode[MutableMapping[TK, Optional[T]]],
+              MutableMapping[TK, AbstractNode[T]]):
     """
     Class implement Map container for configuration tree node model.
 
     Provide interface for access configuration records.
     """
-    def __init__(self, key: TK, value: Mapping[TK, T],
+    def __init__(self, key: TK, value: MutableMapping[TK, T],
                  parent: Optional[AbstractNode[TP]] = None) -> None:
         """
         Create instance of NodeMap.
@@ -162,7 +164,8 @@ class NodeMap(AbstractNode[Mapping[TK, Optional[T]]],
         """
         self._key: TK = key
         self._parent: Optional[AbstractNode[TP]] = parent
-        self.__nodes: Mapping[TK, AbstractNode[T]] = self.__create_nodes(value)
+        self.__nodes: MutableMapping[
+            TK, AbstractNode[T]] = self.__create_nodes(value)
 
     def __repr__(self) -> str:
         """Representation of NodeMap object."""
@@ -177,7 +180,7 @@ class NodeMap(AbstractNode[Mapping[TK, Optional[T]]],
         """Implementation of __len__ magic method."""
         return len(self.__nodes)
 
-    def __call__(self) -> Mapping[TK, Optional[T]]:
+    def __call__(self) -> MutableMapping[TK, Optional[T]]:
         """
         Implementation of __call__ magic method.
 
@@ -186,8 +189,8 @@ class NodeMap(AbstractNode[Mapping[TK, Optional[T]]],
         return {k: v() for k, v in self.__nodes.items()}
 
     def __create_nodes(self,
-                       config: Mapping[TK, T]
-                       ) -> Mapping[TK, AbstractNode[T]]:
+                       config: MutableMapping[TK, T]
+                       ) -> MutableMapping[TK, AbstractNode[T]]:
         """
         Create ConfigNodes for all child values.
 
@@ -220,9 +223,22 @@ class NodeMap(AbstractNode[Mapping[TK, Optional[T]]],
         """
         return self.__nodes[key]
 
+    def __setitem__(self, key: TK, value: AbstractNode[T]) -> None:
+        """
+        Implementation of __setitem__ magic method.
 
-TL = TypeVar('TL')
-TU = Union[NodeList[Any], Node[Any], NodeMap[Any]]
+        :param key: Access key for data
+        :param value: Node, NodeList ot NodeMap
+        """
+        self.__nodes[key] = value
+
+    def __delitem__(self, key: TK) -> None:
+        """
+        Implementation of __delitem__ magic method.
+
+        :param key: Access key for data
+        """
+        del(self.__nodes[key])
 
 
 @overload
@@ -241,7 +257,7 @@ def node_factory(key: TK,
 
 @overload
 def node_factory(key: TK,
-                 value: Mapping[TK, T],
+                 value: MutableMapping[TK, T],
                  parent: Optional[AbstractNode[Any]] = None
                  ) -> NodeMap[T]: ...
 
@@ -259,6 +275,6 @@ def node_factory(key: TK,
                  ) -> TU:
     if isinstance(value, List):
         return NodeList(key, value)
-    elif isinstance(value, Mapping):
+    elif isinstance(value, MutableMapping):
         return NodeMap(key, value)
     return Node(key, value)

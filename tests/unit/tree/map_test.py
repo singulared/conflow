@@ -104,3 +104,10 @@ def test_map_value(value):
     assert node(), value
     for k in value:
         assert node[k]() == value[k]
+
+
+@pytest.mark.parametrize('value', NESTED_VALUES)
+def test_map_delete(value):
+    node = NodeMap('test', value)
+    del(node['nested']['list'])
+    assert len(node.nested) == 1

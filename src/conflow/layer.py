@@ -1,51 +1,47 @@
-from typing import Tuple, Generator, List, overload, TypeVar, Union, Optional
+from abc import abstractmethod
+from typing import TypeVar, Union, Optional
 
-from conflow.node import Node, NodeList, NodeMap, AbstractNode
+from conflow.merge import merge_factory
+from conflow.node import node_factory, TU
+from conflow.policy import MergePolicy
+from typing_extensions import Protocol
 
 T = TypeVar('T')
-P = TypeVar('P')
-
 TK = Union[str, int]
-Path = Tuple[TK, ...]
 
 
-def path_from(path: Optional[Path], key: TK) -> Path:
-    if path is None:
-        return key,
-    return (*path, key)
+class LayerProtocol(Protocol):
+    """Layer interface describes base Layer methods."""
+    @abstractmethod
+    def tree(self) -> TU: ...
+
+    @abstractmethod
+    def merge(self,
+              other: 'LayerProtocol',
+              policy: MergePolicy = MergePolicy.EXTEND
+              ) -> None: ...
 
 
-@overload
-def flatten_tree(path: Optional[Path], node: Node[T]
-                 ) -> Generator[Tuple[Path, Node[T]], None, None]: ...
+class Layer(LayerProtocol):
+    """
+    Layer class is a settings item, for example settings from `.yml` file,
+    `.env` file or pure Python dictionary.
 
+    Provide an interface for merge settings items.
+    """
+    def __init__(self,
+                 settings: T,
+                 name: Optional[TK] = None
+                 ) -> None:
+        self.__name: TK = name if name is not None else id(self)
+        self.__tree = node_factory(self.__name, settings)
 
-@overload
-def flatten_tree(path: Optional[Path], node: NodeList[T]
-                 ) -> Generator[Tuple[Path, NodeList[T]], None, None]: ...
+    def tree(self) -> TU:
+        return self.__tree
 
-
-@overload
-def flatten_tree(path: Optional[Path], node: NodeMap[T]
-                 ) -> Generator[Tuple[Path, AbstractNode[P]], None, None]: ...
-
-
-def flatten_tree(path: Optional[Path], node: AbstractNode[T]
-                 ) -> Generator[Tuple[Path, AbstractNode[P]], None, None]:
-    if isinstance(node, Node):
-        yield path_from(path, node._key), node
-
-    if isinstance(node, NodeList):
-        yield path_from(path, node._key), node
-
-    if isinstance(node, NodeMap):
-        for child_node in node.values():
-            yield from flatten_tree(path_from(path, node._key), child_node)
-
-
-class Layer:
-    def __init__(self, settings: dict, name: TK) -> None:
-        self.__tree = NodeMap(name, settings)
-
-    def flatten(self) -> List[Tuple[AbstractNode[T], Path]]:
-        return list(flatten_tree(None, self.__tree))
+    def merge(self,
+              other: LayerProtocol,
+              policy: MergePolicy = MergePolicy.EXTEND
+              ) -> None:
+        """Implement merge functionality."""
+        self.__tree = merge_factory(self.tree(), other.tree(), policy)
