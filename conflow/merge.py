@@ -9,7 +9,10 @@ from conflow.node import Node, NodeList, NodeMap
 from conflow.policy import MergePolicy
 from conflow.dispatcher import Dispatch
 
-dispatch = Dispatch()
+from typing import Any, Callable
+
+
+dispatch: Dispatch[type, Callable[..., Any]] = Dispatch()
 
 
 @dispatch(Node, Node, MergePolicy)
