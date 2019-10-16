@@ -58,3 +58,13 @@ def test_list_value():
     values = [1, 2.0, 'str', None, 'last_value']
     node_list = NodeList('test', values)
     assert node_list() == values
+
+
+def test_list_keys():
+    values = [
+        {1: 1, 2: 2},
+        {1: 1, 2: 2},
+        {1: 1, 2: 2},
+    ]
+    node_list = NodeList('test', values)
+    assert node_list() == values

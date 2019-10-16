@@ -5,21 +5,20 @@ base: Layer instance that will be extend or override.
 other: Layer instance that will be use for extend or override base.
 policy: Enum option that define extend ot override operations.
 """
-from conflow.node import Node, NodeList, NodeMap
-from conflow.policy import MergePolicy
+from conflow.manager import Config
+from conflow.node import Node, NodeList, NodeMap, T, TP
 from conflow.dispatcher import Dispatch
 
 from typing import Any, Callable
 
-
 dispatch: Dispatch[type, Callable[..., Any]] = Dispatch()
 
 
-@dispatch(Node, Node, MergePolicy)
-def merge_factory(base: Node,
-                  other: Node,
-                  policy: MergePolicy
-                  ) -> Node:
+@dispatch(Node, Node, Config)
+def merge_factory(base: Node[T],
+                  other: Node[TP],
+                  config: Config,
+                  ) -> Node[TP]:
     """
     Implements merge of Node with Node.
 
@@ -28,27 +27,37 @@ def merge_factory(base: Node,
     return other
 
 
-@dispatch(NodeList, NodeList, MergePolicy)
-def merge_factory(base: NodeList,
-                  other: NodeList,
-                  policy: MergePolicy
-                  ) -> NodeList:
+@dispatch(Node, NodeList, Config)  # type: ignore[no-redef]
+def merge_factory(base: Node[T],
+                  other: Node[TP],
+                  config: Config,
+                  ) -> Node[TP]:
+    """
+    Implements merge of Node with Node.
+
+    Use only Override policy.
+    """
+    return config.merge_list(base, other)
+
+
+@dispatch(NodeList, NodeList, Config)  # type: ignore[no-redef]
+def merge_factory(base: NodeList[T],
+                  other: NodeList[TP],
+                  config: Config,
+                  ) -> NodeList[T]:
     """
     Implements merge of NodeList with NodeList.
 
     Use both policies.
     """
-    return (
-        other if policy == MergePolicy.OVERRIDE
-        else NodeList(base._key, [*base, *other])
-    )
+    return config.merge_list(base, other)
 
 
-@dispatch(NodeMap, NodeMap, MergePolicy)
-def merge_factory(base: NodeMap,
-                  other: NodeMap,
-                  policy: MergePolicy
-                  ) -> NodeMap:
+@dispatch(NodeMap, NodeMap, Config)  # type: ignore[no-redef]
+def merge_factory(base: NodeMap[T],
+                  other: NodeMap[TP],
+                  config: Config,
+                  ) -> NodeMap[T]:
     """
     Implements merge of NodeMap with NodeMap.
 
@@ -56,7 +65,7 @@ def merge_factory(base: NodeMap,
     """
     for key, value in other.items():
         if key in base:
-            base[key] = merge_factory(base[key], value, policy)
+            base[key] = merge_factory(base[key], value, config)
         else:
             base[key] = value
 

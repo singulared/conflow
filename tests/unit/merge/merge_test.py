@@ -1,28 +1,27 @@
 from conflow.merge import merge_factory
 from conflow.node import Node, NodeList, NodeMap
-from conflow.policy import MergePolicy
 
 
-def test_merge_node_node():
+def test_merge_node_node(default_config):
     base = Node('base', 'node_A')
     other = Node('other', 'node_B')
-    assert merge_factory(base, other, MergePolicy.OVERRIDE) == other
+    assert merge_factory(base, other, default_config) == other
 
 
-def test_merge_nodelist_nodelist_override():
+def test_merge_nodelist_nodelist_override(default_config):
     base = NodeList('base', [1])
     other = NodeList('other', [2])
-    assert merge_factory(base, other, MergePolicy.OVERRIDE) == other
+    assert merge_factory(base, other, default_config) == other
 
 
-def test_merge_nodelist_nodelist_extend():
+def test_merge_nodelist_nodelist_extend(extend_list_config):
     base = NodeList('base', [1])
     other = NodeList('other', [2])
     expected = NodeList('base', [1, 2])
-    assert merge_factory(base, other, MergePolicy.EXTEND) == expected
+    assert merge_factory(base, other, extend_list_config) == expected
 
 
-def test_merge_nodemap_nodemap_override():
+def test_merge_nodemap_nodemap_override(default_config):
     base = NodeMap('base', {
         'db': {
             'master': {
@@ -37,11 +36,11 @@ def test_merge_nodemap_nodemap_override():
             }
         }
     })
-    result = merge_factory(base, other, MergePolicy.EXTEND)
+    result = merge_factory(base, other, default_config)
     assert result.db.master.host == 'other'
 
 
-def test_merge_nodemap_nodemap_extend():
+def test_merge_nodemap_nodemap_extend(default_config):
     base = NodeMap('base', {
         'master': {
             'host': 'master'
@@ -52,13 +51,13 @@ def test_merge_nodemap_nodemap_extend():
             'host': 'slave'
         }
     })
-    result = merge_factory(base, other, MergePolicy.EXTEND)
+    result = merge_factory(base, other, default_config)
     assert 'master' in result
     assert 'slave' in result
 
 
-def test_merge_nodemap_nodemap_empty():
+def test_merge_nodemap_nodemap_empty(default_config):
     base = NodeMap('base', {})
     other = NodeMap('other', {})
     expected = NodeMap('expected', {})
-    assert merge_factory(base, other, MergePolicy.EXTEND) == expected
+    assert merge_factory(base, other, default_config) == expected

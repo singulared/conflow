@@ -1,6 +1,4 @@
-from collections import Callable
-
-from typing import Dict, Tuple, TypeVar, Generic, Any, cast
+from typing import Dict, Tuple, TypeVar, Callable, Generic, Any, cast
 
 
 T = TypeVar('T', bound=type)

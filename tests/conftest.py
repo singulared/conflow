@@ -1,5 +1,8 @@
 import pytest
 
+from conflow.manager import Config
+from conflow.policy import MergeListPolicy
+
 
 @pytest.fixture
 def config_node_data():
@@ -17,3 +20,15 @@ def config_node_data():
             'none': None
         }
     }
+
+
+@pytest.fixture
+def default_config():
+    return Config()
+
+
+@pytest.fixture
+def extend_list_config():
+    config = Config()
+    config.merge_list = MergeListPolicy.EXTEND
+    return config
