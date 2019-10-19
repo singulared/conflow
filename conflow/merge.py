@@ -19,28 +19,51 @@ def merge_factory(base: Node[T],
                   other: Node[TP],
                   config: Config,
                   ) -> Node[TP]:
-    """
-    Implements merge of Node with Node.
-
-    Use only Override policy.
-    """
+    """Implements merge of Node with Node."""
     return other
 
 
 @dispatch(Node, NodeList, Config)  # type: ignore[no-redef]
 def merge_factory(base: Node[T],
-                  other: Node[TP],
+                  other: NodeList[TP],
                   config: Config,
-                  ) -> Node[TP]:
-    """
-    Implements merge of Node with Node.
+                  ) -> NodeList[TP]:
+    """Implements merge of Node with NodeList."""
+    return config.merge_different(base, other)
 
-    Use only Override policy.
+
+@dispatch(Node, NodeMap, Config)  # type: ignore[no-redef]
+def merge_factory(base: Node[T],
+                  other: NodeMap[TP],
+                  config: Config,
+                  ) -> NodeMap[TP]:
+    """Implements merge of Node with NodeMap."""
+    return config.merge_different(base, other)
+
+
+@dispatch(NodeList, NodeList, Config)  # type: ignore[no-redef]
+def merge_factory(base: NodeList[T],
+                  other: NodeList[TP],
+                  config: Config,
+                  ) -> NodeList[T]:
+    """Implements merge of NodeList with NodeList."""
+    return config.merge_list(base, other)
+
+
+@dispatch(NodeList, Node, Config)  # type: ignore[no-redef]
+def merge_factory(base: NodeList[T],
+                  other: NodeList[TP],
+                  config: Config,
+                  ) -> NodeList[T]:
+    """
+    Implements merge of NodeList with NodeList.
+
+    Use both policies.
     """
     return config.merge_list(base, other)
 
 
-@dispatch(NodeList, NodeList, Config)  # type: ignore[no-redef]
+@dispatch(NodeList, NodeMap, Config)  # type: ignore[no-redef]
 def merge_factory(base: NodeList[T],
                   other: NodeList[TP],
                   config: Config,
