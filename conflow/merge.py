@@ -6,90 +6,127 @@ other: Layer instance that will be use for extend or override base.
 policy: Enum option that define extend ot override operations.
 """
 from conflow.manager import Config
-from conflow.node import Node, NodeList, NodeMap, T, TP
-from conflow.dispatcher import Dispatch
+from conflow.node import Node, NodeList, NodeMap, T, TP, TU, TT, AbstractNode
 
-from typing import Any, Callable
-
-dispatch: Dispatch[type, Callable[..., Any]] = Dispatch()
+from typing import overload, Any
 
 
-@dispatch(Node, Node, Config)
+# Node
+@overload
 def merge_factory(base: Node[T],
                   other: Node[TP],
                   config: Config,
                   ) -> Node[TP]:
-    """Implements merge of Node with Node."""
-    return other
+    """Implements merge of Node and Node."""
+    ...
 
 
-@dispatch(Node, NodeList, Config)  # type: ignore[no-redef]
+@overload
 def merge_factory(base: Node[T],
                   other: NodeList[TP],
                   config: Config,
                   ) -> NodeList[TP]:
-    """Implements merge of Node with NodeList."""
-    return config.merge_different(base, other)
+    """Implements merge of Node and NodeList."""
+    ...
 
 
-@dispatch(Node, NodeMap, Config)  # type: ignore[no-redef]
+@overload
 def merge_factory(base: Node[T],
                   other: NodeMap[TP],
                   config: Config,
                   ) -> NodeMap[TP]:
-    """Implements merge of Node with NodeMap."""
-    return config.merge_different(base, other)
+    """Implements merge of Node and NodeMap."""
+    ...
 
 
-@dispatch(NodeList, NodeList, Config)  # type: ignore[no-redef]
+# NodeList
+@overload
+def merge_factory(base: NodeList[T],
+                  other: Node[TP],
+                  config: Config,
+                  ) -> Node[TP]:
+    """Implements merge of NodeList and Node."""
+    ...
+
+
+@overload
 def merge_factory(base: NodeList[T],
                   other: NodeList[TP],
                   config: Config,
-                  ) -> NodeList[T]:
-    """Implements merge of NodeList with NodeList."""
-    return config.merge_list(base, other)
+                  ) -> NodeList[TT]:
+    """Implements merge of NodeList and NodeList."""
+    ...
 
 
-@dispatch(NodeList, Node, Config)  # type: ignore[no-redef]
+@overload
 def merge_factory(base: NodeList[T],
+                  other: NodeMap[TP],
+                  config: Config,
+                  ) -> NodeMap[TP]:
+    """Implements merge of NodeList and NodeMap."""
+    ...
+
+
+# NodeMap
+@overload
+def merge_factory(base: NodeMap[T],
+                  other: Node[TP],
+                  config: Config,
+                  ) -> NodeMap[TP]:
+    """Implements merge of NodeMap and NodeMap."""
+    ...
+
+
+@overload
+def merge_factory(base: NodeMap[T],
                   other: NodeList[TP],
                   config: Config,
-                  ) -> NodeList[T]:
-    """
-    Implements merge of NodeList with NodeList.
-
-    Use both policies.
-    """
-    return config.merge_list(base, other)
+                  ) -> NodeMap[TP]:
+    """Implements merge of NodeMap and NodeMap."""
+    ...
 
 
-@dispatch(NodeList, NodeMap, Config)  # type: ignore[no-redef]
-def merge_factory(base: NodeList[T],
-                  other: NodeList[TP],
-                  config: Config,
-                  ) -> NodeList[T]:
-    """
-    Implements merge of NodeList with NodeList.
-
-    Use both policies.
-    """
-    return config.merge_list(base, other)
-
-
-@dispatch(NodeMap, NodeMap, Config)  # type: ignore[no-redef]
+@overload
 def merge_factory(base: NodeMap[T],
                   other: NodeMap[TP],
                   config: Config,
-                  ) -> NodeMap[T]:
-    """
-    Implements merge of NodeMap with NodeMap.
+                  ) -> NodeMap[TT]:
+    """Implements merge of NodeMap and NodeMap."""
+    ...
 
-    Use only Extend policy.
-    """
-    for key, value in other.items():
-        if key in base:
-            base[key] = merge_factory(base[key], value, config)
-        else:
-            base[key] = value
 
-    return base
+# Realization
+def merge_factory(base: TU, other: TU, config) -> TU:
+    if isinstance(base, Node) and isinstance(other, Node):
+        return other
+
+    if isinstance(base, Node) and isinstance(other, NodeList):
+        return config.merge_different(base, other)
+
+    if isinstance(base, Node) and isinstance(other, NodeMap):
+        return config.merge_different(base, other)
+
+    if isinstance(base, NodeList) and isinstance(other, Node):
+        return config.merge_different(base, other)
+
+    if isinstance(base, NodeList) and isinstance(other, NodeList):
+        return config.merge_list(base, other)
+
+    if isinstance(base, NodeList) and isinstance(other, NodeMap):
+        return config.merge_different(base, other)
+
+    if isinstance(base, NodeMap) and isinstance(other, Node):
+        return config.merge_different(base, other)
+
+    if isinstance(base, NodeMap) and isinstance(other, NodeList):
+        return config.merge_different(base, other)
+
+    if isinstance(base, NodeMap) and isinstance(other, NodeMap):
+        for key, value in other.items():
+            if key in base:
+                base[key] = merge_factory(base[key], value, config)
+            else:
+                base[key] = value
+        return base
+
+    return other

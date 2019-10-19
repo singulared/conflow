@@ -1,9 +1,9 @@
 import logging
 from enum import Enum
 
-from typing import Tuple, Union, Any, TypeVar
+from typing import Tuple, Union, TypeVar, Any
 
-from conflow.node import Node, NodeList, NodeMap
+from conflow.node import NodeList, Node, NodeMap
 from mypy_extensions import NoReturn
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 T = TypeVar('T')
 TP = TypeVar('TP')
 TT = TypeVar('TT')
-TU = Union['NodeList[Any]', 'Node[Any]', 'NodeMap[Any]']
+TU = Union[Node[Any], NodeList[Any], NodeMap[Any]]
 
 
 def return_other(_: T, other: TP) -> TP:
@@ -55,7 +55,7 @@ class NotifyDifferentTypesPolicy(Enum):
     QUIET = quiet
 
 
-def override_nodelist(base: T, other: TP) -> TP:
+def override_nodelist(_: T, other: TP) -> TP:
     return other
 
 
