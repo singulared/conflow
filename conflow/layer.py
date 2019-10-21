@@ -1,3 +1,4 @@
+from __future__ import annotations
 from abc import abstractmethod
 from typing import TypeVar, Union, Optional
 
@@ -24,7 +25,7 @@ class LayerProtocol(Protocol):
     def tree(self) -> TU: ...
 
     @abstractmethod
-    def merge(self, other: 'LayerProtocol') -> None: ...
+    def merge(self, other: LayerProtocol) -> None: ...
 
 
 class Layer(LayerProtocol):

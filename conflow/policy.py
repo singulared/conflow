@@ -1,7 +1,7 @@
 import logging
 from enum import Enum
 
-from typing import Tuple, Union, TypeVar, Any
+from typing import Union, TypeVar, Any
 
 from conflow.node import NodeList, Node, NodeMap
 from mypy_extensions import NoReturn
@@ -40,7 +40,7 @@ def notify_warning(base: T, other: TP) -> None:
     logger.warning('Merge different types %s : %s', base, other)
 
 
-def quiet(*args: Tuple[T, TP]) -> None:
+def quiet(base: T, other: TP) -> None:
     ...
 
 

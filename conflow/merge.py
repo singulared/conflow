@@ -6,9 +6,9 @@ other: Layer instance that will be use for extend or override base.
 policy: Enum option that define extend ot override operations.
 """
 from conflow.manager import Config
-from conflow.node import Node, NodeList, NodeMap, T, TP, TU, TT, AbstractNode
+from conflow.node import Node, NodeList, NodeMap, T, TP, TU, TT
 
-from typing import overload, Any
+from typing import overload, cast
 
 
 # Node
@@ -96,7 +96,7 @@ def merge_factory(base: NodeMap[T],
 
 
 # Realization
-def merge_factory(base: TU, other: TU, config) -> TU:
+def merge_factory(base: TU, other: TU, config: Config) -> TU:
     if isinstance(base, Node) and isinstance(other, Node):
         return other
 
@@ -124,7 +124,11 @@ def merge_factory(base: TU, other: TU, config) -> TU:
     if isinstance(base, NodeMap) and isinstance(other, NodeMap):
         for key, value in other.items():
             if key in base:
-                base[key] = merge_factory(base[key], value, config)
+                base[key] = merge_factory(
+                    cast(TU, base[key]),
+                    cast(TU, value),
+                    config
+                )
             else:
                 base[key] = value
         return base
