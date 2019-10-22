@@ -30,5 +30,5 @@ def default_config():
 @pytest.fixture
 def extend_list_config():
     config = Config()
-    config.merge_list = MergeListPolicy.EXTEND
+    config.merge_list = MergeListPolicy.extend
     return config
