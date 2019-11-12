@@ -42,7 +42,7 @@ class NotifyDifferentTypesPolicy:
     """
 
     @staticmethod
-    def warning(base: T, other: TP):
+    def warning(base: T, other: TP) -> None:
         logger.warning('Merge different types %s : %s', base, other)
 
     @staticmethod
