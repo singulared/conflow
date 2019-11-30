@@ -1,6 +1,6 @@
-============================
-Python Configuration manager
-============================
+=======
+Conflow
+=======
 
 .. image:: https://travis-ci.org/singulared/conflow.svg?branch=master
     :target: https://travis-ci.org/singulared/conflow
@@ -8,6 +8,13 @@ Python Configuration manager
   :target: https://codecov.io/gh/singulared/conflow
 
 Project in early beta. Work in progress!
+
+Conflow organizes layered configurations for Python applications.
+Conflow allows you to use default settings and extend or override it
+via merging settings from different sources:
+- Python dictionaries
+- Files: yaml, json, ini
+- Environment variables
 
 Quickstart
 ==========
@@ -21,9 +28,10 @@ Usage
 
 .. code-block:: python
 
+  import os
   from conflow import Config, FromFile, FromEnvironment
 
-  LOCAL_SETTINGS = {
+  DEFAULT_SETTINGS = {
       'db': {
           'master': {
               'host': 'localhost',
@@ -33,20 +41,16 @@ Usage
               'host': 'localhost',
               'port': 5433,
           }
-      },
-      'cache': {
-          'redis': {
-              'sentinel': {
-                  'host': 'localhost',
-                  'port': 26379
-              }
-          }
       }
   }
 
-  yaml_settings = FromFile(path='settings.yaml')
-  env_settings = FromEnvironment(prefix='my_app')
-  config = Config.merge(LOCAL_SETTINGS).merge(yaml_settings).merge(env_settings)
+  os.environ['APP_DB_MASTER_HOST'] = 'remote_host'
+
+  env_settings = FromEnvironment(prefix='app')
+  config = Config(DEFAULT_SETTINGS).merge(env_settings)
+
+  assert config.db.master.host == 'remote_host'
+  assert config.db.slave.host == 'localhost'
 
 Motivation
 ==========
