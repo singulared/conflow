@@ -110,7 +110,7 @@ def merge_factory(base: TU, other: TU, config: Config) -> TU:
         return config.merge_different(base, other)
 
     if isinstance(base, NodeList) and isinstance(other, NodeList):
-        return config.merge_list(base, other)
+        return config.merge_list(base, other)  # type: ignore
 
     if isinstance(base, NodeList) and isinstance(other, NodeMap):
         return config.merge_different(base, other)
