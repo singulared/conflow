@@ -47,7 +47,7 @@ Usage
   os.environ['APP_DB_MASTER_HOST'] = 'remote_host'
 
   env_settings = FromEnvironment(prefix='app')
-  config = Config(DEFAULT_SETTINGS).merge(env_settings)
+  config = Config().merge(DEFAULT_SETTINGS).merge(env_settings)
 
   assert config.db.master.host == 'remote_host'
   assert config.db.slave.host == 'localhost'
