@@ -3,9 +3,10 @@ language: python
 python:
   - "3.6"
   - "3.7"
+  - "3.8"
 
 install:
-  - pip install poetry==1.0.0-b1
+  - pip install poetry==1.0.2
   - poetry install 
 
 script:
