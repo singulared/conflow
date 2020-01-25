@@ -1,4 +1,4 @@
-from typing import Callable, NoReturn, TypeVar, Union, MutableMapping
+from typing import Callable, TypeVar, Union, MutableMapping
 
 import conflow
 from conflow.node import AbstractNode
@@ -19,7 +19,7 @@ class Config:
     and merging Layers from different sources.
     """
     def __init__(self,
-                 merge_different: Callable[..., NoReturn] =
+                 merge_different: Callable[..., None] =
                  MergeDifferentTypesPolicy.not_strict,
                  merge_list: Callable[[T, TP], TP] =
                  MergeListPolicy.override,
