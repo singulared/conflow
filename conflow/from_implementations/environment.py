@@ -41,7 +41,7 @@ class FromEnvironment(From):
         current_dict = self.map
         while len(path) > 1:
             key = path.pop()
-            if not key in current_dict:
+            if key not in current_dict:
                 current_dict[key] = {}
             current_dict = current_dict[key]
         current_dict[path.pop()] = try_str_int(env_var_value)
