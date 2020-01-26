@@ -3,7 +3,7 @@ import pytest
 import os
 
 from conflow import FromEnvironment
-from conflow.from_implementations.environment import try_str_int
+from conflow.froms.environment import try_str_int
 
 ENV_SETTINGS = {
     'APP_DB__MASTER__HOST': 'localhost',

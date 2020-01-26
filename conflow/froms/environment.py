@@ -1,20 +1,25 @@
 import os
-from typing import Union
-from conflow.from_implementations.base import From
+from typing import Union, Optional, TypeVar, MutableMapping, Dict
+
+from conflow.froms.base import From
 
 DELIMITER = '__'
+
+TK = Union[str, int]
+T = TypeVar('T')
 
 
 def try_str_int(value: str) -> Union[str, int]:
     """Try to convert str to int and return int or original str."""
+    converted: Optional[int] = None
     try:
-        value = int(value)
+        converted = int(value)
     except ValueError:
         pass
-    return value
+    return value if converted is None else converted
 
 
-class FromEnvironment(From):
+class FromEnvironment(From[MutableMapping[TK, T]]):
     """
     Use environment variables as a source.
 
@@ -25,7 +30,7 @@ class FromEnvironment(From):
         self.prefix = '{0}_'.format(prefix)
         super().__init__()
 
-    def load_by_prefix(self) -> dict:
+    def load_by_prefix(self) -> Dict[str, str]:
         """Load env variables and filter by prefix."""
         envs_pairs = filter(
             lambda item: item[0].startswith(self.prefix),
@@ -40,17 +45,19 @@ class FromEnvironment(From):
         :param env_var_name: delimited keys.
         :param env_var_value: result value.
         """
-        path = env_var_name[len(self.prefix):]
-        path = path.split(DELIMITER)
-        path = list(map(lambda item: item.lower(), path))
-        path = list(reversed(path))
-        current_dict = self.map
-        while len(path) > 1:
-            key = path.pop()
+        joined_path = env_var_name[len(self.prefix):]
+        keys = joined_path.split(DELIMITER)
+        lower_keys = list(map(
+            lambda item: item.lower(), keys
+        ))
+        reversed_keys = list(reversed(lower_keys))
+        current_dict: Dict[TK, T] = self.map
+        while len(reversed_keys) > 1:
+            key = reversed_keys.pop()
             if key not in current_dict:
                 current_dict[key] = {}
             current_dict = current_dict[key]
-        current_dict[path.pop()] = try_str_int(env_var_value)
+        current_dict[reversed_keys.pop()] = try_str_int(env_var_value)
 
     def parse(self) -> None:
         """Parse all envs and fill `map`."""

@@ -22,7 +22,7 @@ def test_from_yaml_exists():
 
 def test_from_yaml_correct_parses(yaml_fixture):
     mocked_open = mock.mock_open(read_data=yaml_fixture)
-    with mock.patch('conflow.from_implementations.yml.open', mocked_open):
+    with mock.patch('conflow.froms.yml.open', mocked_open):
         yml = FromYaml('file.yaml')
         assert yml['db']['master']['host'] == 'localhost'
         assert yml['db']['master']['port'] == 5432
