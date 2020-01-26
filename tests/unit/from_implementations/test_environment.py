@@ -63,8 +63,3 @@ def test_from_environment_get_item(mock_env):
     env = FromEnvironment('APP')
     assert env['db'] == DICT_REPRESENTATION['db']
     assert env['db']['master'] == DICT_REPRESENTATION['db']['master']
-
-
-def test_from_environment_works(mock_env):
-    config = Config().merge(FromEnvironment('APP'))
-    assert config.db.master is not None

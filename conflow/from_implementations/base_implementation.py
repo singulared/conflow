@@ -22,10 +22,15 @@ class From(MutableMapping):
         :param key: Access key for data
         :param value: int or str
         """
-        self.map.__setitem__(self, key, value)
+        self.map[key] = value
 
-    def __delitem__(self, *args, **kwargs):
-        self.map.__delitem__(*args, **kwargs)
+    def __delitem__(self, key):
+        """
+        Implementation of __delitem__ magic method.
+
+        :param key: Access key for data
+        """
+        del self.map[key]
 
     def __iter__(self):
         """Implement iterator interface for map."""
