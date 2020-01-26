@@ -1,6 +1,6 @@
 import os
 from typing import Union
-from conflow.from_implementations.base_implementation import From
+from conflow.from_implementations.base import From
 
 DELIMITER = '__'
 
@@ -15,6 +15,12 @@ def try_str_int(value: str) -> Union[str, int]:
 
 
 class FromEnvironment(From):
+    """
+    Use environment variables as a source.
+
+    Filter all environment variables, leave only those that start with
+    the given prefix and build a new layer on them.
+    """
     def __init__(self, prefix: str) -> None:
         self.prefix = '{0}_'.format(prefix)
         super().__init__()
@@ -46,9 +52,8 @@ class FromEnvironment(From):
             current_dict = current_dict[key]
         current_dict[path.pop()] = try_str_int(env_var_value)
 
-    def parse(self) -> dict:
+    def parse(self) -> None:
         """Parse all envs and fill `map`."""
         envs_pairs = self.load_by_prefix()
         for env_var_name, env_var_value in envs_pairs.items():
             self.add_pair(env_var_name, env_var_value)
-        return self.map

@@ -4,7 +4,6 @@ import os
 
 from conflow import FromEnvironment
 from conflow.from_implementations.environment import try_str_int
-from conflow.manager import Config
 
 ENV_SETTINGS = {
     'APP_DB__MASTER__HOST': 'localhost',
@@ -22,7 +21,7 @@ DICT_REPRESENTATION = {
 
 
 @pytest.fixture
-def mock_env():
+def env_fixture():
     for key, value in ENV_SETTINGS.items():
         os.environ[key] = value
 
@@ -31,7 +30,7 @@ def test_from_environment_exists():
     assert hasattr(conflow, 'FromEnvironment')
 
 
-def test_from_environment_correct_loads(mock_env):
+def test_from_environment_correct_loads(env_fixture):
     env = FromEnvironment('APP')
     selected = env.load_by_prefix()
     assert len(selected) == 2
@@ -46,7 +45,7 @@ def test_from_environment_correct_adds_pairs():
     assert env.map == DICT_REPRESENTATION
 
 
-def test_from_environment_correct_parses(mock_env):
+def test_from_environment_correct_parses(env_fixture):
     env = FromEnvironment('APP')
     env.parse()
     assert env.map == DICT_REPRESENTATION
@@ -59,7 +58,7 @@ def test_from_environment_try_str_int():
     assert try_str_int('76.2') == '76.2'
 
 
-def test_from_environment_get_item(mock_env):
+def test_from_environment_get_item(env_fixture):
     env = FromEnvironment('APP')
     assert env['db'] == DICT_REPRESENTATION['db']
     assert env['db']['master'] == DICT_REPRESENTATION['db']['master']

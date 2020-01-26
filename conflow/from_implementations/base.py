@@ -1,13 +1,19 @@
-from typing import MutableMapping
+from typing import MutableMapping, Any
 
 
 class From(MutableMapping):
-    """Implement basic logic for parsing and serving values."""
-    def __init__(self, *args, **kwargs):
+    """
+    Various `From*` implementations allow you to load data from different
+    sources and convert them into dictionaries, that will be used
+    to create layers.
+
+    Basic implementation is required to implement the MutableMapping protocol.
+    """
+    def __init__(self, *args, **kwargs) -> None:
         self.map = {}
         self.parse()
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> Any:
         """
         Implementation of __getitem__ magic method.
 
@@ -15,7 +21,7 @@ class From(MutableMapping):
         """
         return self.map[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value) -> None:
         """
         Implementation of __setitem__ magic method.
 
@@ -24,7 +30,7 @@ class From(MutableMapping):
         """
         self.map[key] = value
 
-    def __delitem__(self, key):
+    def __delitem__(self, key) -> None:
         """
         Implementation of __delitem__ magic method.
 
@@ -32,14 +38,14 @@ class From(MutableMapping):
         """
         del self.map[key]
 
-    def __iter__(self):
+    def __iter__(self) -> None:
         """Implement iterator interface for map."""
         return iter(self.map)
 
-    def __len__(self):
+    def __len__(self) -> None:
         """Implementation of __len__ magic method."""
         return len(self.map)
 
-    def parse(self):
+    def parse(self) -> None:
         """Fill `map`."""
         raise NotImplementedError

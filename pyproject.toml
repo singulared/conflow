@@ -37,6 +37,7 @@ mypy = "0.730"
 lxml = "^4.4.1"
 flake8 = "^3.7.8"
 flake8-html = "^0.4.0"
+mock = "^3.0.5"
 ipdb = "^0.12.2"
 
 [build-system]
