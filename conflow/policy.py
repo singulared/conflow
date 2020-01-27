@@ -2,7 +2,6 @@ import logging
 from typing import Union, TypeVar, Any
 
 from conflow.node import NodeList, Node, NodeMap
-from mypy_extensions import NoReturn
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +23,7 @@ class MergeDifferentTypesPolicy:
         return other
 
     @staticmethod
-    def not_strict(base: T, other: TP) -> NoReturn:
+    def not_strict(base: T, other: TP) -> None:
         raise RuntimeError(
             'Cannot merge mismatched types {base} {other}.'.format(
                 base=type(base).__name__,
