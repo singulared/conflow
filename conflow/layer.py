@@ -1,10 +1,11 @@
 from abc import abstractmethod
 from typing import TypeVar, Union, Optional
 
+from typing_extensions import Protocol
+
 from conflow.manager import Config
 from conflow.merge import merge_factory
 from conflow.node import node_factory, TU
-from typing_extensions import Protocol
 
 T = TypeVar('T')
 TK = Union[str, int]

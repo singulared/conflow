@@ -5,10 +5,10 @@ base: Layer instance that will be extend or override.
 other: Layer instance that will be use for extend or override base.
 policy: Enum option that define extend ot override operations.
 """
+from typing import overload, cast
+
 from conflow.manager import Config
 from conflow.node import Node, NodeList, NodeMap, T, TP, TU, TT
-
-from typing import overload, cast
 
 
 # Node
