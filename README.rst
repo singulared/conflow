@@ -29,7 +29,7 @@ Usage
 .. code-block:: python
 
   import os
-  from conflow import Config, FromFile, FromEnvironment
+  from conflow import Config, FromEnv
 
   DEFAULT_SETTINGS = {
       'db': {
@@ -44,13 +44,14 @@ Usage
       }
   }
 
-  os.environ['APP_DB_MASTER_HOST'] = 'remote_host'
+  config = Config().merge(DEFAULT_SETTINGS)
+  assert config.db.master.host() == 'localhost'
 
-  env_settings = FromEnvironment(prefix='app')
+  os.environ['APP_DB__MASTER__HOST'] = 'remote_host'
+  env_settings = FromEnv('APP')
+
   config = Config().merge(DEFAULT_SETTINGS).merge(env_settings)
-
-  assert config.db.master.host == 'remote_host'
-  assert config.db.slave.host == 'localhost'
+  assert config.db.master.host() == 'remote_host'
 
 Motivation
 ==========
