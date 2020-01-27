@@ -29,7 +29,7 @@ Usage
 .. code-block:: python
 
   import os
-  from conflow import Config, from_env
+  from conflow import Config, from_env, from_yaml
 
   DEFAULT_SETTINGS = {
       'db': {
@@ -52,6 +52,11 @@ Usage
 
   config = Config().merge(DEFAULT_SETTINGS).merge(env_settings)
   assert config.db.master.host() == 'remote_host'
+
+  develop_settings = from_yaml('config/develop.yaml', required=False)
+  config = Config().merge(DEFAULT_SETTINGS).merge(env_settings).merge(develop_settings)
+  assert config.db.master.host() == 'develop'
+
 
 Motivation
 ==========
