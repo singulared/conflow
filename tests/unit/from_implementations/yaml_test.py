@@ -29,5 +29,5 @@ def test_from_yaml_correct_parses(yaml_fixture):
 
 
 def test_from_yaml_correct_work_non_exists_file():
-    yml = from_yaml('file.yaml', default={})
+    yml = from_yaml('file.yaml', allow_exception=False)
     assert len(yml) == 0
