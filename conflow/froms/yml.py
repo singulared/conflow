@@ -1,25 +1,19 @@
 import yaml
-from typing import Union, Optional, TypeVar, MutableMapping
-
-from conflow.froms.base import From
+from typing import Union, TypeVar, Dict, Optional
 
 TK = Union[str, int]
 T = TypeVar('T')
 
 
-class FromYaml(From[MutableMapping[TK, T]]):
+def from_yaml(file_name: str, default: Optional[Dict[TK, T]] = None
+              ) -> Dict[TK, T]:
     """Use .yaml file as a source."""
-    def __init__(self, file_name: str) -> None:
-        self.file_name = file_name
-        self.yaml_str = Optional[str]
-        super().__init__()
-
-    def load_file(self) -> None:
-        """Read file to string."""
-        with open(self.file_name, 'r') as file_handler:
-            self.yaml_str  = file_handler.read()
-
-    def parse(self) -> None:
-        """Fill `map`."""
-        self.load_file()
-        self.map = yaml.safe_load(self.yaml_str )
+    try:
+        with open(file_name, 'r') as file_handler:
+            yaml_str  = file_handler.read()
+            return yaml.safe_load(yaml_str)
+    except FileNotFoundError as error:
+        if default is None:
+            raise FileNotFoundError(error)
+        else:
+            return default

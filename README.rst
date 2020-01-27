@@ -29,7 +29,7 @@ Usage
 .. code-block:: python
 
   import os
-  from conflow import Config, FromEnv
+  from conflow import Config, from_env
 
   DEFAULT_SETTINGS = {
       'db': {
@@ -48,7 +48,7 @@ Usage
   assert config.db.master.host() == 'localhost'
 
   os.environ['APP_DB__MASTER__HOST'] = 'remote_host'
-  env_settings = FromEnv('APP')
+  env_settings = from_env('APP')
 
   config = Config().merge(DEFAULT_SETTINGS).merge(env_settings)
   assert config.db.master.host() == 'remote_host'

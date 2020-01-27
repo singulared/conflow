@@ -1,7 +1,5 @@
 import os
-from typing import Union, Optional, TypeVar, MutableMapping, Dict
-
-from conflow.froms.base import From
+from typing import Union, Optional, TypeVar, Dict
 
 DELIMITER = '__'
 
@@ -19,48 +17,47 @@ def try_str_int(value: str) -> Union[str, int]:
     return value if converted is None else converted
 
 
-class FromEnv(From[MutableMapping[TK, T]]):
+def load_by_prefix(prefix: str) -> Dict[str, str]:
+    """Load env variables and filter by prefix."""
+    envs_pairs = filter(
+        lambda item: item[0].startswith(prefix),
+        os.environ.items()
+    )
+    start_index = len(prefix) + 1
+    prepared_envs_pairs = map(
+        lambda item: (item[0][start_index:], item[1]),
+        envs_pairs
+    )
+    return dict(prepared_envs_pairs)
+
+
+def add_pair(env_map: Dict[TK, T], env_var_name: str, env_var_value: str
+             ) -> Dict[TK, T]:
     """
-    Use environment variables as a source.
+    Add to `map` pair keys: value.
 
-    Filter all environment variables, leave only those that start with
-    the given prefix and build a new layer on them.
+    :param env_map: updated dictionary.
+    :param env_var_name: delimited keys.
+    :param env_var_value: result value.
     """
-    def __init__(self, prefix: str) -> None:
-        self.prefix = '{0}_'.format(prefix)
-        super().__init__()
+    keys = env_var_name.split(DELIMITER)
+    lower_keys = list(map(
+        lambda item : item.lower(), keys
+    ))
+    reversed_keys = list(reversed(lower_keys))
+    current_dict: Dict[TK, T] = env_map
+    while len(reversed_keys) > 1 :
+        key = reversed_keys.pop()
+        if key not in current_dict :
+            current_dict[key] = {}
+        current_dict = current_dict[key]
+    current_dict[reversed_keys.pop()] = try_str_int(env_var_value)
+    return env_map
 
-    def load_by_prefix(self) -> Dict[str, str]:
-        """Load env variables and filter by prefix."""
-        envs_pairs = filter(
-            lambda item: item[0].startswith(self.prefix),
-            os.environ.items()
-        )
-        return dict(envs_pairs)
 
-    def add_pair(self, env_var_name: str, env_var_value: str) -> None:
-        """
-        Add to `map` pair keys: value.
-
-        :param env_var_name: delimited keys.
-        :param env_var_value: result value.
-        """
-        joined_path = env_var_name[len(self.prefix):]
-        keys = joined_path.split(DELIMITER)
-        lower_keys = list(map(
-            lambda item: item.lower(), keys
-        ))
-        reversed_keys = list(reversed(lower_keys))
-        current_dict: Dict[TK, T] = self.map
-        while len(reversed_keys) > 1:
-            key = reversed_keys.pop()
-            if key not in current_dict:
-                current_dict[key] = {}
-            current_dict = current_dict[key]
-        current_dict[reversed_keys.pop()] = try_str_int(env_var_value)
-
-    def parse(self) -> None:
-        """Parse all envs and fill `map`."""
-        envs_pairs = self.load_by_prefix()
-        for env_var_name, env_var_value in envs_pairs.items():
-            self.add_pair(env_var_name, env_var_value)
+def from_env(prefix: str) -> Dict[TK, T]:
+    envs_pairs = load_by_prefix(prefix)
+    env_map = {}
+    for env_var_name, env_var_value in envs_pairs.items():
+        add_pair(env_map, env_var_name, env_var_value)
+    return env_map

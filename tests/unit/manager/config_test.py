@@ -1,5 +1,7 @@
 import pytest
+import os
 
+from conflow import from_env
 from conflow.manager import Config
 
 DEFAULT_SETTINGS = {
@@ -54,3 +56,11 @@ def test_config_get_attr(config):
 def test_config_get_item(config):
     config = config.merge(DEFAULT_SETTINGS)
     assert config['db']['master']['host'] == 'localhost'
+
+
+def test_config_with_froms(config):
+    os.environ['APP_DB__MASTER__HOST'] = 'env_host'
+    os.environ['APP_DB__SLAVE__HOST'] = 'env_host'
+    config = config.merge(DEFAULT_SETTINGS).merge(from_env('APP'))
+    assert config.db.master.host() == 'env_host'
+    assert config.db.slave.host() == 'env_host'
