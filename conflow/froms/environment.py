@@ -19,7 +19,7 @@ def try_str_int(value: str) -> Union[str, int]:
     return value if converted is None else converted
 
 
-class FromEnvironment(From[MutableMapping[TK, T]]):
+class FromEnv(From[MutableMapping[TK, T]]):
     """
     Use environment variables as a source.
 
