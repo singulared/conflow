@@ -4,6 +4,7 @@ from typing import (Any, Collection, Generic, Iterable, Iterator, List,
 TK = Union[str, int]
 VALUE_TYPES = Optional[Union[str, int, float, bool]]
 
+TV = TypeVar('TV', str, int, float, bool, None)
 T = TypeVar('T')
 TP = TypeVar('TP')
 TT = TypeVar('TT')
@@ -15,7 +16,7 @@ class AbstractNode(Generic[T]):
     def __call__(self) -> Optional[T]: ...
 
 
-class Node(AbstractNode[Optional[T]]):
+class Node(AbstractNode[Optional[TV]]):
     """
     Base class of Node tree.
 
@@ -23,7 +24,7 @@ class Node(AbstractNode[Optional[T]]):
     and basic comparison operation.
     """
     def __init__(self, key: TK,
-                 value: Optional[T] = None,
+                 value: Optional[TV] = None,
                  parent: Optional[AbstractNode[TP]] = None):
         """
         Create instance of Config Node.
@@ -33,10 +34,10 @@ class Node(AbstractNode[Optional[T]]):
         :param parent: parent Node object
         """
         self._key: TK = key
-        self._value: Optional[T] = value
+        self._value: Optional[TV] = value
         self._parent: Optional[AbstractNode[TP]] = parent
 
-    def __call__(self) -> Optional[T]:
+    def __call__(self) -> Optional[TV]:
         """
         Implementation of __call__ magic method.
 
@@ -243,9 +244,9 @@ class NodeMap(AbstractNode[MutableMapping[TK, Optional[T]]],
 
 @overload
 def node_factory(key: TK,
-                 value: VALUE_TYPES,
+                 value: TV,
                  parent: Optional[AbstractNode[Any]] = None
-                 ) -> Node[VALUE_TYPES]: ...
+                 ) -> Node[TV]: ...
 
 
 @overload
@@ -262,19 +263,22 @@ def node_factory(key: TK,
                  ) -> NodeMap[T]: ...
 
 
-@overload
-def node_factory(key: TK,
-                 value: T,
-                 parent: Optional[AbstractNode[Any]] = None
-                 ) -> TU: ...
-
-
 def node_factory(key: TK,
                  value: TL,
                  parent: Optional[AbstractNode[TP]] = None,
                  ) -> TU:
-    if isinstance(value, List):
+    if isinstance(value, (int, float, bool, str, type(None))):
+        return Node(key, value)
+    elif isinstance(value, List):
         return NodeList(key, value)
     elif isinstance(value, MutableMapping):
         return NodeMap(key, value)
-    return Node(key, value)
+    raise ValueError('Invalid value type: {}'.format(type(value)))
+
+
+#  if __name__ == '__main__':
+    #  from itertools import chain
+    #  a = node_factory('base', [1, 2, 3, 'b', {'a': 123}])
+    #  b = node_factory('other', [3.14, None])
+    #  c = NodeList('base', [cast(AbstractNode[TP], el)() for el in chain(a, b)])
+    #  print(c[4])

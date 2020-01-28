@@ -1,7 +1,8 @@
 import logging
-from typing import Union, TypeVar, Any
+from typing import Union, TypeVar, Any, cast, Optional
+from itertools import chain
 
-from conflow.node import NodeList, Node, NodeMap
+from conflow.node import NodeList, Node, NodeMap, AbstractNode
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +55,7 @@ class MergeListPolicy:
     Class describes list merge policies.
 
     override option is used to replace the base value with another value.
-    extend option is used to add other values ​​to the base.
+    extend option is used to add other values to the base.
     """
 
     @staticmethod
@@ -63,5 +64,8 @@ class MergeListPolicy:
 
     @staticmethod
     def extend(base: NodeList[T], other: NodeList[TP]
-               ) -> NodeList[Union[T, TP]]:
-        return NodeList(base._key, [*base, *other])
+               ) -> NodeList[Optional[Union[T, TP]]]:
+        return NodeList(
+            base._key,
+            [cast(AbstractNode[Union[T, TP]], node)() for node in chain(
+                base, other)])
