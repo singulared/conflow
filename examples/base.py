@@ -2,6 +2,8 @@ import os
 from conflow import Config, from_env, from_yaml
 from typing import Dict
 
+PATH = os.path.dirname(__file__)
+
 DEFAULT_SETTINGS = {
     'db': {
         'master': {
@@ -24,8 +26,13 @@ env_settings: Dict = from_env('APP')
 config = Config().merge(DEFAULT_SETTINGS).merge(env_settings)
 assert config.db.master.host() == 'remote_host'
 
-develop_settings: Dict = from_yaml('config/develop.yaml', required=False)
+develop_settings = from_yaml(
+    os.path.join(PATH, 'config', 'develop.yaml'),
+    required=True)
+
 config = Config().merge(
     DEFAULT_SETTINGS
 ).merge(env_settings).merge(develop_settings)
 assert config.db.master.host() == 'develop'
+
+print(repr(config.db))

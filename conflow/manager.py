@@ -1,4 +1,4 @@
-from typing import Callable, TypeVar, Union, MutableMapping, Optional
+from typing import Callable, TypeVar, Union, Dict
 
 import conflow
 from conflow.node import AbstractNode
@@ -35,7 +35,7 @@ class Config:
         self.layer: conflow.LayerProtocol = conflow.Layer(
             self, {})  # type: ignore
 
-    def merge(self, settings: MutableMapping[TK, T]) -> 'Config':
+    def merge(self, settings: Dict[str, T]) -> 'Config':
         """
         Merges two layers
         :param settings: source dictionary

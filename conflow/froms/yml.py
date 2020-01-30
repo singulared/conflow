@@ -1,12 +1,11 @@
-from typing import Union, TypeVar, Dict
+from typing import TypeVar, Dict, Any
 
 import yaml
 
-TK = Union[str, int]
 T = TypeVar('T')
 
 
-def from_yaml(file_name: str, required: bool = True) -> Dict[TK, T]:
+def from_yaml(file_name: str, required: bool = False) -> Dict[str, Any]:
     """Use .yaml file as a source."""
     try:
         with open(file_name, 'r') as file_handler:
