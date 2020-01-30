@@ -1,11 +1,11 @@
 from abc import abstractmethod
-from typing import TypeVar, Union, Optional
+from typing import TypeVar, Union, Optional, Dict, List
 
 from typing_extensions import Protocol
 
 from conflow.manager import Config
 from conflow.merge import merge_factory
-from conflow.node import node_factory, TU
+from conflow.node import node_factory, TU, VALUE_TYPES
 
 T = TypeVar('T')
 TK = Union[str, int]
@@ -35,9 +35,10 @@ class Layer(LayerProtocol):
 
     Provide an interface for merge settings items.
     """
+
     def __init__(self,
                  config: Config,
-                 settings: T,
+                 settings: Union[Dict, List, VALUE_TYPES],
                  name: Optional[TK] = None
                  ) -> None:
         self.config = config

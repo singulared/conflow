@@ -2,6 +2,7 @@ dist: xenial
 language: python
 python:
   - "3.6"
+  - "3.7"
   - "3.8"
 
 install:
@@ -14,3 +15,13 @@ script:
   - codecov
   - pip install codacy-coverage
   - python-codacy-coverage -r coverage.xml
+
+jobs:
+  include:
+    - stage: mypy
+      script: 
+        - echo "Run mypu"
+        - pip install mypy
+        - mypy conflow
+      # Keep in mind to overwrite these here
+      python: 3.8

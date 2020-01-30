@@ -1,5 +1,5 @@
 import os
-from typing import Union, Optional, TypeVar, Dict
+from typing import Union, Optional, TypeVar, Dict, Any
 
 DELIMITER = '__'
 
@@ -31,8 +31,8 @@ def load_by_prefix(prefix: str) -> Dict[str, str]:
     return dict(prepared_envs_pairs)
 
 
-def add_pair(env_map: Dict[TK, T], env_var_name: str, env_var_value: str
-             ) -> Dict[TK, T]:
+def add_pair(env_map: Dict[TK, Any], env_var_name: str, env_var_value: str
+             ) -> Dict[TK, Any]:
     """
     Add to `map` pair keys: value.
 
@@ -42,13 +42,13 @@ def add_pair(env_map: Dict[TK, T], env_var_name: str, env_var_value: str
     """
     keys = env_var_name.split(DELIMITER)
     lower_keys = list(map(
-        lambda item : item.lower(), keys
+        lambda item: item.lower(), keys
     ))
     reversed_keys = list(reversed(lower_keys))
-    current_dict: Dict[TK, T] = env_map
-    while len(reversed_keys) > 1 :
+    current_dict: Dict[TK, Any] = env_map
+    while len(reversed_keys) > 1:
         key = reversed_keys.pop()
-        if key not in current_dict :
+        if key not in current_dict:
             current_dict[key] = {}
         current_dict = current_dict[key]
     current_dict[reversed_keys.pop()] = try_str_int(env_var_value)
@@ -57,7 +57,7 @@ def add_pair(env_map: Dict[TK, T], env_var_name: str, env_var_value: str
 
 def from_env(prefix: str) -> Dict[TK, T]:
     envs_pairs = load_by_prefix(prefix)
-    env_map = {}
+    env_map: Dict[TK, Any] = {}
     for env_var_name, env_var_value in envs_pairs.items():
         add_pair(env_map, env_var_name, env_var_value)
     return env_map

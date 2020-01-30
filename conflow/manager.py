@@ -1,4 +1,4 @@
-from typing import Callable, TypeVar, Union, MutableMapping
+from typing import Callable, TypeVar, Union, MutableMapping, Optional
 
 import conflow
 from conflow.node import AbstractNode
@@ -18,10 +18,13 @@ class Config:
     Config is a manager class provided an interface for the creation
     and merging Layers from different sources.
     """
+
     def __init__(self,
-                 merge_different: Callable[..., None] =
+                 merge_different: Callable[[AbstractNode, AbstractNode],
+                                           AbstractNode] =
                  MergeDifferentTypesPolicy.not_strict,
-                 merge_list: Callable[[T, TP], TP] =
+                 merge_list: Callable[[AbstractNode, AbstractNode],
+                                      AbstractNode] =
                  MergeListPolicy.override,
                  notification: Callable[..., None] =
                  NotifyDifferentTypesPolicy.warning,
@@ -29,14 +32,15 @@ class Config:
         self.merge_different = merge_different
         self.merge_list = merge_list
         self.notification = notification
-        self.layer: conflow.LayerProtocol = conflow.Layer(self, {})
+        self.layer: conflow.LayerProtocol = conflow.Layer(
+            self, {})  # type: ignore
 
     def merge(self, settings: MutableMapping[TK, T]) -> 'Config':
         """
         Merges two layers
         :param settings: source dictionary
         """
-        layer = conflow.Layer(self, settings)
+        layer = conflow.Layer(self, settings)  # type: ignore
         self.layer.merge(layer)
         return self
 
@@ -48,10 +52,13 @@ class Config:
         """
         return self.layer.tree()[key]
 
-    def __getattr__(self, name: TK) -> AbstractNode[T]:
+    def __getattr__(self, name: TK) -> Optional[AbstractNode]:
         """
         Implementation of __getattr__ magic method.
 
         :param name: Attribute name (data access key)
         """
-        return self.layer.tree().get(name)
+        if isinstance(name, str):
+            return getattr(self.layer.tree(), name)
+        else:
+            raise ValueError("Attribute must be str only")

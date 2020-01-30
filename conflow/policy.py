@@ -20,11 +20,11 @@ class MergeDifferentTypesPolicy:
     `not_strict` return `other` node.
     """
     @staticmethod
-    def strict(_: T, other: TP) -> TP:
+    def not_strict(_: AbstractNode, other: AbstractNode) -> AbstractNode:
         return other
 
     @staticmethod
-    def not_strict(base: T, other: TP) -> None:
+    def strict(base: T, other: TP) -> None:
         raise RuntimeError(
             'Cannot merge mismatched types {base} {other}.'.format(
                 base=type(base).__name__,
@@ -59,7 +59,7 @@ class MergeListPolicy:
     """
 
     @staticmethod
-    def override(_: T, other: TP) -> TP:
+    def override(_: AbstractNode, other: AbstractNode) -> AbstractNode:
         return other
 
     @staticmethod

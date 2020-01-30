@@ -15,6 +15,19 @@ TL = TypeVar('TL')
 class AbstractNode(Generic[T]):
     def __call__(self) -> Optional[T]: ...
 
+    def __getitem__(self, key: TK) -> 'AbstractNode':
+        raise NotImplementedError
+
+    def __getattr__(self, name: TK) -> 'AbstractNode':
+        """
+        Implementation of __getattr__ magic method.
+
+        This method return new empty Node for case of chained access.
+
+        :param name: Attribute name (data access key)
+        """
+        return Node(name, None)
+
 
 class Node(AbstractNode[Optional[TV]]):
     """
@@ -23,6 +36,7 @@ class Node(AbstractNode[Optional[TV]]):
     Implement some type of container for generic value
     and basic comparison operation.
     """
+
     def __init__(self, key: TK,
                  value: Optional[TV] = None,
                  parent: Optional[AbstractNode[TP]] = None):
@@ -58,16 +72,6 @@ class Node(AbstractNode[Optional[TV]]):
         """Implementation of != operator."""
         return self() != other
 
-    def __getattr__(self, name: TK) -> AbstractNode[None]:
-        """
-        Implementation of __getattr__ magic method.
-
-        This method return new empty Node for case of chained access.
-
-        :param name: Attribute name (data access key)
-        """
-        return Node(name, None)
-
 
 class NodeList(AbstractNode[Collection[Optional[T]]],
                Collection[AbstractNode[T]]):
@@ -76,6 +80,7 @@ class NodeList(AbstractNode[Collection[Optional[T]]],
 
     Provide interface for access configuration records.
     """
+
     def __init__(self, key: TK, value: Iterable[T],
                  parent: Optional[AbstractNode[TP]] = None) -> None:
         """
@@ -139,13 +144,16 @@ class NodeList(AbstractNode[Collection[Optional[T]]],
         """Implementation of __len__ magic method."""
         return len(self.__nodes)
 
-    def __getitem__(self, key: int) -> AbstractNode[T]:
+    def __getitem__(self, key: TK) -> AbstractNode[T]:
         """
         Implementation of __getitem__ magic method.
 
         :param key: Access key for data
         """
-        return self.__nodes[key]
+        if isinstance(key, int):
+            return self.__nodes[key]
+        else:
+            raise ValueError("Key must be integer")
 
 
 class NodeMap(AbstractNode[MutableMapping[TK, Optional[T]]],
@@ -155,6 +163,7 @@ class NodeMap(AbstractNode[MutableMapping[TK, Optional[T]]],
 
     Provide interface for access configuration records.
     """
+
     def __init__(self, key: TK, value: MutableMapping[TK, T],
                  parent: Optional[AbstractNode[TP]] = None) -> None:
         """
