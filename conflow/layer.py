@@ -35,6 +35,7 @@ class Layer(LayerProtocol):
 
     Provide an interface for merge settings items.
     """
+
     def __init__(self,
                  config: Config,
                  settings: T,

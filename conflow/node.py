@@ -15,6 +15,13 @@ TL = TypeVar('TL')
 class AbstractNode(Generic[T]):
     def __call__(self) -> Optional[T]: ...
 
+    def is_map(self) -> bool:
+        return False
+
+    def __iter__(self) -> Iterator:
+        """Implement iterator interface for child nodes."""
+        return iter(self)
+
 
 class Node(AbstractNode[Optional[TV]]):
     """
@@ -23,6 +30,7 @@ class Node(AbstractNode[Optional[TV]]):
     Implement some type of container for generic value
     and basic comparison operation.
     """
+
     def __init__(self, key: TK,
                  value: Optional[TV] = None,
                  parent: Optional[AbstractNode[TP]] = None):
@@ -76,6 +84,7 @@ class NodeList(AbstractNode[Collection[Optional[T]]],
 
     Provide interface for access configuration records.
     """
+
     def __init__(self, key: TK, value: Iterable[T],
                  parent: Optional[AbstractNode[TP]] = None) -> None:
         """
@@ -155,6 +164,7 @@ class NodeMap(AbstractNode[MutableMapping[TK, Optional[T]]],
 
     Provide interface for access configuration records.
     """
+
     def __init__(self, key: TK, value: MutableMapping[TK, T],
                  parent: Optional[AbstractNode[TP]] = None) -> None:
         """
@@ -241,6 +251,9 @@ class NodeMap(AbstractNode[MutableMapping[TK, Optional[T]]],
         """
         del(self.__nodes[key])
 
+    def is_map(self) -> bool:
+        return True
+
 
 @overload
 def node_factory(key: TK,
@@ -276,9 +289,9 @@ def node_factory(key: TK,
     raise ValueError('Invalid value type: {}'.format(type(value)))
 
 
-#  if __name__ == '__main__':
-    #  from itertools import chain
-    #  a = node_factory('base', [1, 2, 3, 'b', {'a': 123}])
-    #  b = node_factory('other', [3.14, None])
-    #  c = NodeList('base', [cast(AbstractNode[TP], el)() for el in chain(a, b)])
-    #  print(c[4])
+if __name__ == '__main__':
+    from itertools import chain
+    a = node_factory('base', [1, 2, 3, 'b', {'a': 123}])
+    b = node_factory('other', [3.14, None])
+    c = NodeList('base', [cast(AbstractNode, el)() for el in chain(a, b)])
+    print(c[4])

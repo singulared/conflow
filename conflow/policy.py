@@ -1,8 +1,8 @@
 import logging
-from typing import Union, TypeVar, Any, cast, Optional
+from typing import Union, TypeVar, Any, cast, Optional, Callable
 from itertools import chain
 
-from conflow.node import NodeList, Node, NodeMap, AbstractNode
+from conflow.node import NodeList, Node, NodeMap, AbstractNode, TV as NB
 
 logger = logging.getLogger(__name__)
 
@@ -10,6 +10,23 @@ T = TypeVar('T')
 TP = TypeVar('TP')
 TT = TypeVar('TT')
 TU = Union[Node[Any], NodeList[Any], NodeMap[Any]]
+
+#  NB = TypeVar('NB', int, float, str, bool, None)
+TB = TypeVar('TB')
+TO = TypeVar('TO')
+NO = TypeVar('NO', int, float, str, bool, None)
+TR = Union[
+    Node[NO],
+    NodeList[TO],
+    NodeMap[TO],
+    Node[NO],
+    NodeList[Union[TB, TO]],
+    NodeMap[Union[TB, NO]],
+    NodeMap[Union[TB, TO]],
+]
+
+T_BASE = Union[Node[NB], NodeList[TB], NodeMap[TB]]
+T_OTHER = Union[Node[NO], NodeList[TO], NodeMap[TO]]
 
 
 class MergeDifferentTypesPolicy:
@@ -19,12 +36,15 @@ class MergeDifferentTypesPolicy:
     `strict` raise an exception if different types are merged.
     `not_strict` return `other` node.
     """
+
     @staticmethod
-    def strict(_: T, other: TP) -> TP:
+    def not_strict(_: T,
+                   other: T_OTHER[NO, TO]
+                   ) -> AbstractNode:
         return other
 
     @staticmethod
-    def not_strict(base: T, other: TP) -> None:
+    def strict(base: T, other: TP) -> None:
         raise RuntimeError(
             'Cannot merge mismatched types {base} {other}.'.format(
                 base=type(base).__name__,
