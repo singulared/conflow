@@ -19,9 +19,9 @@ script:
 jobs:
   include:
     - stage: mypy
+      intall: skip
       script: 
         - echo "Run mypu"
         - pip install mypy
         - mypy conflow
-      # Keep in mind to overwrite these here
       python: 3.8
