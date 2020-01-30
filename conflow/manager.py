@@ -52,7 +52,7 @@ class Config:
         """
         return self.layer.tree()[key]
 
-    def __getattr__(self, name: TK) -> Optional[AbstractNode]:
+    def __getattr__(self, name: TK) -> AbstractNode[T]:
         """
         Implementation of __getattr__ magic method.
 

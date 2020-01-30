@@ -13,7 +13,7 @@ TL = TypeVar('TL')
 
 
 class AbstractNode(Generic[T]):
-    def __call__(self) -> Optional[T]: ...
+    def __call__(self) -> T: ...
 
     def __getitem__(self, key: TK) -> 'AbstractNode':
         raise NotImplementedError
@@ -38,7 +38,7 @@ class Node(AbstractNode[Optional[TV]]):
     """
 
     def __init__(self, key: TK,
-                 value: Optional[TV] = None,
+                 value: TV,
                  parent: Optional[AbstractNode[TP]] = None):
         """
         Create instance of Config Node.
@@ -48,10 +48,10 @@ class Node(AbstractNode[Optional[TV]]):
         :param parent: parent Node object
         """
         self._key: TK = key
-        self._value: Optional[TV] = value
+        self._value: TV = value
         self._parent: Optional[AbstractNode[TP]] = parent
 
-    def __call__(self) -> Optional[TV]:
+    def __call__(self) -> TV:
         """
         Implementation of __call__ magic method.
 
@@ -215,7 +215,7 @@ class NodeMap(AbstractNode[MutableMapping[TK, Optional[T]]],
 
         :param name: Attribute name (data access key)
         """
-        return self.__nodes.get(name, cast(AbstractNode[T], Node(name)))
+        return self.__nodes.get(name, cast(AbstractNode[T], Node(name, None)))
 
     def __contains__(self, item: TT) -> bool:
         """
