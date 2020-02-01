@@ -8,6 +8,30 @@ def test_merge_node_node(default_config):
     assert merge_factory(base, other, default_config) == other
 
 
+def test_merge_node_nodelist(default_config):
+    base = Node('base', 'node_A')
+    other = NodeList('other', [2])
+    assert merge_factory(base, other, default_config) == other
+
+
+def test_merge_node_nodemap(default_config):
+    base = Node('base', 'node_A')
+    other = NodeMap('other', {
+        'db': {
+            'master': {
+                'host': 'other'
+            }
+        }
+    })
+    assert merge_factory(base, other, default_config) == other
+
+
+def test_merge_nodelist_node(default_config):
+    base = NodeList('other', [2])
+    other = Node('base', 'node_A')
+    assert merge_factory(base, other, default_config) == other
+
+
 def test_merge_nodelist_nodelist_override(default_config):
     base = NodeList('base', [1])
     other = NodeList('other', [2])
@@ -19,6 +43,42 @@ def test_merge_nodelist_nodelist_extend(extend_list_config):
     other = NodeList('other', [2])
     expected = NodeList('base', [1, 2])
     assert merge_factory(base, other, extend_list_config) == expected
+
+
+def test_merge_nodelist_nodemap(default_config):
+    base = NodeList('base', [1])
+    other = NodeMap('base', {
+        'db': {
+            'master': {
+                'host': 'base'
+            }
+        }
+    })
+    assert merge_factory(base, other, default_config) == other
+
+
+def test_merge_nodemap_node(default_config):
+    base = NodeMap('base', {
+        'db': {
+            'master': {
+                'host': 'base'
+            }
+        }
+    })
+    other = Node('base', 'node_A')
+    assert merge_factory(base, other, default_config) == other
+
+
+def test_merge_nodemap_nodelist(default_config):
+    base = NodeMap('base', {
+        'db': {
+            'master': {
+                'host': 'base'
+            }
+        }
+    })
+    other = NodeList('base', [1])
+    assert merge_factory(base, other, default_config) == other
 
 
 def test_merge_nodemap_nodemap_override(default_config):
