@@ -1,3 +1,5 @@
+import pytest
+
 from conflow.merge import merge_factory
 from conflow.node import Node, NodeList, NodeMap
 
@@ -121,3 +123,14 @@ def test_merge_nodemap_nodemap_empty(default_config):
     other = NodeMap('other', {})
     expected = NodeMap('expected', {})
     assert merge_factory(base, other, default_config) == expected
+
+
+def test_merge_different_types_strict(strict_config):
+    base = NodeMap('base', {'merged_key': {'a': 'b'}})
+    other = NodeMap('other', {'merged_key': 1})
+    with pytest.raises(RuntimeError) as error:
+        merge_factory(base, other, strict_config)
+    error_message = (
+        "Cannot merge `{'a': 'b'}` and `1` with key `merged_key`"
+    )
+    assert str(error.value) == error_message

@@ -283,11 +283,3 @@ def node_factory(key: TK,
     elif isinstance(value, MutableMapping):
         return NodeMap(key, value)
     raise ValueError('Invalid value type: {}'.format(type(value)))
-
-
-#  if __name__ == '__main__':
-    #  from itertools import chain
-    #  a = node_factory('base', [1, 2, 3, 'b', {'a': 123}])
-    #  b = node_factory('other', [3.14, None])
-    #  c = NodeList('base', [cast(AbstractNode[TP], el)() for el in chain(a, b)])
-    #  print(c[4])
