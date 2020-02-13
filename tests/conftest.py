@@ -1,7 +1,7 @@
 import pytest
 
 from conflow.manager import Config
-from conflow.policy import MergeListPolicy
+from conflow.policy import MergeListPolicy, MergeDifferentTypesPolicy
 
 
 @pytest.fixture
@@ -25,6 +25,11 @@ def config_node_data():
 @pytest.fixture
 def default_config():
     return Config()
+
+
+@pytest.fixture
+def strict_config():
+    return Config(merge_different=MergeDifferentTypesPolicy.strict)
 
 
 @pytest.fixture

@@ -24,11 +24,12 @@ class MergeDifferentTypesPolicy:
         return other
 
     @staticmethod
-    def strict(base: T, other: TP) -> None:
+    def strict(base: AbstractNode, other: AbstractNode) -> None:
         raise RuntimeError(
-            'Cannot merge mismatched types {base} {other}.'.format(
-                base=type(base).__name__,
-                other=type(other).__name__
+            'Cannot merge `{base_key}` and `{other_key}` with key `{key}`'.format(
+                base_key=base(),
+                other_key=other(),
+                key=base._key
             )
         )
 
