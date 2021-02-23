@@ -7,8 +7,6 @@ Conflow
 .. image:: https://codecov.io/gh/singulared/conflow/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/singulared/conflow
 
-Project in early beta. Work in progress!
-
 Conflow organizes layered configurations for Python applications.
 Conflow allows you to use default settings and extend or override it
 via merging settings from different sources:
